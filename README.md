@@ -2,6 +2,7 @@ __FoxesWorld__ launcher
 
   **TODO**
   - Rewrite server profiles
+  - New command `clientList` - to show the list of loaded clients
   - Rewrite filesLoad
   - Add optional files to every client
   - Add optional server settings
