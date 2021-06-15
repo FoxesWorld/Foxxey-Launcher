@@ -12,6 +12,7 @@ import pro.gravit.launchserver.auth.provider.AcceptAuthProvider;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.config.LaunchServerConfig;
+import pro.gravit.launchserver.socket.response.auth.MysqlClientProfileProvider;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;

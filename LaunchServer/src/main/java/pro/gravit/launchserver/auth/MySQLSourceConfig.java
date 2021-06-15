@@ -32,7 +32,7 @@ public final class MySQLSourceConfig implements AutoCloseable {
     private String username;
     private String password;
     private String database;
-    private String timeZone;
+    private String timezone;
     private boolean enableHikari;
 
     // Cache
@@ -93,7 +93,7 @@ public final class MySQLSourceConfig implements AutoCloseable {
             mysqlSource.setPassword(password);
             mysqlSource.setDatabaseName(database);
             mysqlSource.setTcpNoDelay(true);
-            if (timeZone != null) mysqlSource.setServerTimezone(timeZone);
+            if (timezone != null) mysqlSource.setServerTimezone(timezone);
             hikari = false;
             // Try using HikariCP
             source = mysqlSource;

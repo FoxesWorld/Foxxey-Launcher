@@ -151,7 +151,6 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
         taskPool = new Timer("Timered task worker thread", true);
         launcherLibraries = directories.launcherLibrariesDir;
         launcherLibrariesCompile = directories.launcherLibrariesCompileDir;
-
         config.setLaunchServer(this);
 
         modulesManager.invokeEvent(new NewLaunchServerInstanceEvent(this));
@@ -393,13 +392,8 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
     }
 
     public void syncProfilesDir() throws IOException {
-        logger.info("Syncing profiles dir");
-        List<ClientProfile> newProfies = new LinkedList<>();
-        IOHelper.walk(profilesDir, new ProfilesFileVisitor(newProfies), false);
+        profilesList = Set.copyOf(config.clientProfileProvider.getAll());
 
-        // Sort and set new profiles
-        newProfies.sort(Comparator.comparing(a -> a));
-        profilesList = Set.copyOf(newProfies);
         if (pingServerManager != null)
             pingServerManager.syncServers();
     }

@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.LauncherConfig;
+import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.handler.MemoryAuthHandler;
@@ -21,6 +22,8 @@ import pro.gravit.launchserver.components.Component;
 import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.components.RegLimiterComponent;
 import pro.gravit.launchserver.dao.provider.DaoProvider;
+import pro.gravit.launchserver.socket.response.auth.ClientProfileProvider;
+import pro.gravit.launchserver.socket.response.auth.MysqlClientProfileProvider;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
 
@@ -49,6 +52,7 @@ public final class LaunchServerConfig {
     public LauncherConf launcher;
     public JarSignerConf sign;
     public String startScript;
+    public ClientProfileProvider clientProfileProvider;
     private transient LaunchServer server = null;
     private transient AuthProviderPair authDefault;
 
@@ -167,6 +171,9 @@ public final class LaunchServerConfig {
                 break;
             }
         }
+        if (clientProfileProvider == null) {
+            throw new NullPointerException("ClientProfileProvider must not be null");
+        }
         if (protectHandler == null) {
             throw new NullPointerException("ProtectHandler must not be null");
         }
@@ -197,6 +204,10 @@ public final class LaunchServerConfig {
             server.registerObject("protectHandler", protectHandler);
             protectHandler.init(server);
             protectHandler.checkLaunchServerLicense();
+        }
+        if (clientProfileProvider != null) {
+            clientProfileProvider.init();
+            server.registerObject("clientProfileProvider", clientProfileProvider);
         }
         if (sessions != null) {
             sessions.init(server);
@@ -247,6 +258,10 @@ public final class LaunchServerConfig {
         if (protectHandler != null) {
             server.unregisterObject("protectHandler", protectHandler);
             protectHandler.close();
+        }
+        if (clientProfileProvider != null) {
+            server.unregisterObject("clientProfileProvider", clientProfileProvider);
+            clientProfileProvider.close();
         }
         if (sessions != null) {
             server.unregisterObject("sessions", sessions);
