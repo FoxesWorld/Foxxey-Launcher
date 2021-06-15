@@ -1,6 +1,7 @@
 __FoxesWorld__ launcher
 
   **TODO**
+  - __SystemdNotifer__
   - Rewrite server profiles
   - New command `clientList` - to show the list of loaded clients
   - Rewrite filesLoad
