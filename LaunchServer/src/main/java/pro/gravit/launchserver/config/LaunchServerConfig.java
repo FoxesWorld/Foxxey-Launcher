@@ -2,6 +2,8 @@ package pro.gravit.launchserver.config;
 
 import io.netty.channel.epoll.Epoll;
 import io.netty.handler.logging.LogLevel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.LauncherConfig;
 import pro.gravit.launchserver.LaunchServer;
@@ -16,11 +18,11 @@ import pro.gravit.launchserver.auth.texture.RequestTextureProvider;
 import pro.gravit.launchserver.binary.tasks.exe.Launch4JTask;
 import pro.gravit.launchserver.components.AuthLimiterComponent;
 import pro.gravit.launchserver.components.Component;
+import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.components.RegLimiterComponent;
 import pro.gravit.launchserver.dao.provider.DaoProvider;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -28,15 +30,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class LaunchServerConfig {
+    private transient final Logger logger = LogManager.getLogger();
     public String projectName;
     public String[] mirrors;
     public String binaryName;
     public boolean copyBinaries = true;
+    public boolean cacheUpdates = true;
     public LauncherConfig.LauncherEnvironment env;
     public Map<String, AuthProviderPair> auth;
+    @Deprecated
     public DaoProvider dao;
     public SessionStorage sessions;
-
     // Handlers & Providers
     public ProtectHandler protectHandler;
     public Map<String, Component> components;
@@ -89,15 +93,13 @@ public final class LaunchServerConfig {
         } // such as on ARM
         newConfig.netty.performance.bossThread = 2;
         newConfig.netty.performance.workerThread = 8;
+        newConfig.netty.performance.schedulerThread = 2;
 
         newConfig.launcher = new LauncherConf();
         newConfig.launcher.guardType = "no";
         newConfig.launcher.compress = true;
-        newConfig.launcher.attachLibraryBeforeProGuard = false;
         newConfig.launcher.deleteTempFiles = true;
-        newConfig.launcher.enabledProGuard = true;
         newConfig.launcher.stripLineNumbers = true;
-        newConfig.launcher.proguardGenMappings = true;
 
         newConfig.sign = new JarSignerConf();
 
@@ -112,6 +114,8 @@ public final class LaunchServerConfig {
         regLimiterComponent.rateLimitMillis = 1000 * 60 * 60 * 10; //Блок на 10 часов
         regLimiterComponent.message = "Превышен лимит регистраций";
         newConfig.components.put("regLimiter", regLimiterComponent);
+        ProGuardComponent proGuardComponent = new ProGuardComponent();
+        newConfig.components.put("proguard", proGuardComponent);
         return newConfig;
     }
 
@@ -152,6 +156,10 @@ public final class LaunchServerConfig {
             throw new NullPointerException("AuthProviderPair`s count should be at least one");
         }
 
+        if (dao != null) {
+            logger.warn("DAO deprecated and may be remove in future release");
+        }
+
         boolean isOneDefault = false;
         for (AuthProviderPair pair : auth.values()) {
             if (pair.isDefault) {
@@ -177,6 +185,9 @@ public final class LaunchServerConfig {
         Launcher.applyLauncherEnv(env);
         for (Map.Entry<String, AuthProviderPair> provider : auth.entrySet()) {
             provider.getValue().init(server, provider.getKey());
+            if (!provider.getValue().isUseCore()) {
+                logger.warn("Deprecated auth {}: legacy provider/handler auth may be removed in future release", provider.getKey());
+            }
         }
         if (dao != null) {
             server.registerObject("dao", dao);
@@ -187,7 +198,7 @@ public final class LaunchServerConfig {
             protectHandler.init(server);
             protectHandler.checkLaunchServerLicense();
         }
-        if(sessions != null) {
+        if (sessions != null) {
             sessions.init(server);
             server.registerObject("sessions", sessions);
         }
@@ -198,6 +209,8 @@ public final class LaunchServerConfig {
             for (AuthProviderPair pair : auth.values()) {
                 server.registerObject("auth.".concat(pair.name).concat(".provider"), pair.provider);
                 server.registerObject("auth.".concat(pair.name).concat(".handler"), pair.handler);
+                server.registerObject("auth.".concat(pair.name).concat(".core"), pair.core);
+                server.registerObject("auth.".concat(pair.name).concat(".social"), pair.core);
                 server.registerObject("auth.".concat(pair.name).concat(".texture"), pair.textureProvider);
             }
         }
@@ -210,6 +223,8 @@ public final class LaunchServerConfig {
                 for (AuthProviderPair pair : auth.values()) {
                     server.unregisterObject("auth.".concat(pair.name).concat(".provider"), pair.provider);
                     server.unregisterObject("auth.".concat(pair.name).concat(".handler"), pair.handler);
+                    server.unregisterObject("auth.".concat(pair.name).concat(".social"), pair.social);
+                    server.unregisterObject("auth.".concat(pair.name).concat(".core"), pair.core);
                     server.unregisterObject("auth.".concat(pair.name).concat(".texture"), pair.textureProvider);
                     pair.close();
                 }
@@ -221,25 +236,25 @@ public final class LaunchServerConfig {
                         try {
                             ((AutoCloseable) component).close();
                         } catch (Exception e) {
-                            LogHelper.error(e);
+                            logger.error(e);
                         }
                     }
                 });
             }
         } catch (Exception e) {
-            LogHelper.error(e);
+            logger.error(e);
         }
         if (protectHandler != null) {
             server.unregisterObject("protectHandler", protectHandler);
             protectHandler.close();
         }
-        if(sessions != null) {
+        if (sessions != null) {
             server.unregisterObject("sessions", sessions);
             if (sessions instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) sessions).close();
                 } catch (Exception e) {
-                    LogHelper.error(e);
+                    logger.error(e);
                 }
             }
         }
@@ -249,7 +264,7 @@ public final class LaunchServerConfig {
                 try {
                     ((AutoCloseable) dao).close();
                 } catch (Exception e) {
-                    LogHelper.error(e);
+                    logger.error(e);
                 }
             }
         }
@@ -293,15 +308,13 @@ public final class LaunchServerConfig {
 
     public static class LauncherConf {
         public String guardType;
-        public boolean attachLibraryBeforeProGuard;
         public boolean compress;
         @Deprecated
         public boolean warningMissArchJava;
-        public boolean enabledProGuard;
         public boolean stripLineNumbers;
         public boolean deleteTempFiles;
-        public boolean proguardGenMappings;
         public boolean certificatePinning;
+        public boolean encryptRuntime;
         public int memoryLimit = 256;
     }
 
@@ -325,6 +338,7 @@ public final class LaunchServerConfig {
         public boolean usingEpoll;
         public int bossThread;
         public int workerThread;
+        public int schedulerThread;
         public long sessionLifetimeMs = 24 * 60 * 60 * 1000;
         public int maxWebSocketRequestBytes = 1024 * 1024;
     }

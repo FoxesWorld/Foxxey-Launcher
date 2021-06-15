@@ -1,6 +1,8 @@
 package pro.gravit.launchserver.manangers;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -23,15 +25,12 @@ import org.bouncycastle.util.io.pem.PemWriter;
 import pro.gravit.launcher.LauncherTrustManager;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
-import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.net.URL;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.*;
 import java.security.cert.CertificateException;
@@ -50,6 +49,7 @@ import java.util.List;
 public class CertificateManager {
     public final int validDays = 60;
     public final int minusHours = 6;
+    private transient final Logger logger = LogManager.getLogger();
     public X509CertificateHolder ca;
     public AsymmetricKeyParameter caKey;
     public X509CertificateHolder server;
@@ -170,9 +170,20 @@ public class CertificateManager {
     public void readTrustStore(Path dir) throws IOException, CertificateException {
         if (!IOHelper.isDir(dir)) {
             Files.createDirectories(dir);
-            try (OutputStream outputStream = IOHelper.newOutput(dir.resolve("GravitCentralRootCA.crt"));
-                 InputStream inputStream = IOHelper.newInput(IOHelper.getResourceURL("pro/gravit/launchserver/defaults/GravitCentralRootCA.crt"))) {
-                IOHelper.transfer(inputStream, outputStream);
+            try {
+                URL inBuildCert = IOHelper.getResourceURL("pro/gravit/launchserver/defaults/BuildCertificate.crt");
+                try (OutputStream outputStream = IOHelper.newOutput(dir.resolve("BuildCertificate.crt"));
+                     InputStream inputStream = IOHelper.newInput(inBuildCert)) {
+                    IOHelper.transfer(inputStream, outputStream);
+                }
+            } catch (NoSuchFileException ignored) {
+
+            }
+
+        } else {
+            if (IOHelper.exists(dir.resolve("GravitCentralRootCA.crt"))) {
+                logger.warn("Found old default certificate - 'GravitCentralRootCA.crt'. Delete...");
+                Files.delete(dir.resolve("GravitCentralRootCA.crt"));
             }
         }
         List<X509Certificate> certificates = new ArrayList<>();
@@ -201,7 +212,7 @@ public class CertificateManager {
             if (mode == LauncherTrustManager.CheckMode.EXCEPTION_IN_NOT_SIGNED)
                 throw new SecurityException(String.format("Class %s not signed", clazz.getName()));
             else if (mode == LauncherTrustManager.CheckMode.WARN_IN_NOT_SIGNED)
-                LogHelper.warning("Class %s not signed", clazz.getName());
+                logger.warn("Class {} not signed", clazz.getName());
             return;
         }
         try {
@@ -210,6 +221,7 @@ public class CertificateManager {
             throw new SecurityException(e);
         }
     }
+
     public LauncherTrustManager.CheckClassResult checkClass(Class<?> clazz) {
         X509Certificate[] certificates = JVMHelper.getCertificates(clazz);
         return trustManager.checkCertificates(certificates, trustManager::stdCertificateChecker);

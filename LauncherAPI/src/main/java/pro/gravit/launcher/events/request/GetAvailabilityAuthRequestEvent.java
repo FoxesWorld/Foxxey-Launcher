@@ -2,6 +2,7 @@ package pro.gravit.launcher.events.request;
 
 import pro.gravit.launcher.LauncherNetworkAPI;
 import pro.gravit.launcher.events.RequestEvent;
+import pro.gravit.utils.TypeSerializeInterface;
 
 import java.util.List;
 
@@ -35,24 +36,38 @@ public class GetAvailabilityAuthRequestEvent extends RequestEvent {
         }
     }
 
-    public static class AuthAvailability {
-        @LauncherNetworkAPI
-        public final String name;
-        @LauncherNetworkAPI
-        public final String displayName;
-        @LauncherNetworkAPI
-        public final AuthType firstType;
-        @LauncherNetworkAPI
-        public final AuthType secondType;
+    public interface AuthAvailabilityDetails extends TypeSerializeInterface {
+    }
 
+    public static class AuthAvailability {
+        public final List<AuthAvailabilityDetails> details;
+        @LauncherNetworkAPI
+        public String name;
+        @LauncherNetworkAPI
+        public String displayName;
+        @Deprecated
+        @LauncherNetworkAPI
+        public AuthType firstType;
+        @Deprecated
+        @LauncherNetworkAPI
+        public AuthType secondType;
+
+        @Deprecated
         public AuthAvailability(String name, String displayName, AuthType firstType, AuthType secondType) {
             this.name = name;
             this.displayName = displayName;
             this.firstType = firstType;
             this.secondType = secondType;
+            this.details = null;
         }
 
+        public AuthAvailability(String name, String displayName, List<AuthAvailabilityDetails> details) {
+            this.name = name;
+            this.displayName = displayName;
+            this.details = details;
+        }
 
+        @Deprecated
         public enum AuthType {
             @LauncherNetworkAPI
             PASSWORD,

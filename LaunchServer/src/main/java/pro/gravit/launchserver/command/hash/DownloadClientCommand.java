@@ -1,15 +1,15 @@
 package pro.gravit.launchserver.command.hash;
 
 import com.google.gson.JsonElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,13 +19,15 @@ import java.util.UUID;
 
 public final class DownloadClientCommand extends Command {
 
+    private transient final Logger logger = LogManager.getLogger();
+
     public DownloadClientCommand(LaunchServer server) {
         super(server);
     }
 
     @Override
     public String getArgsDescription() {
-        return "[version] [dir]";
+        return "[version] [dir] (mirror/generate)";
     }
 
     @Override
@@ -41,32 +43,47 @@ public final class DownloadClientCommand extends Command {
         String dirName = IOHelper.verifyFileName(args[1]);
         Path clientDir = server.updatesDir.resolve(args[1]);
 
+        boolean isMirrorClientDownload = false;
+        if (args.length > 2) {
+            isMirrorClientDownload = args[2].equals("mirror");
+        }
+
         // Create client dir
-        LogHelper.subInfo("Creating client dir: '%s'", dirName);
+        logger.info("Creating client dir: '{}'", dirName);
         Files.createDirectory(clientDir);
 
         // Download required client
-        LogHelper.subInfo("Downloading client, it may take some time");
+        logger.info("Downloading client, it may take some time");
         //HttpDownloader.downloadZip(server.mirrorManager.getDefaultMirror().getClientsURL(version.name), clientDir);
         server.mirrorManager.downloadZip(clientDir, "clients/%s.zip", versionName);
 
         // Create profile file
-        LogHelper.subInfo("Creaing profile file: '%s'", dirName);
-        ClientProfile client;
-        String profilePath = String.format("pro/gravit/launchserver/defaults/profile%s.cfg", versionName);
-        try (BufferedReader reader = IOHelper.newReader(IOHelper.getResourceURL(profilePath))) {
-            client = Launcher.gsonManager.configGson.fromJson(reader, ClientProfile.class);
-        } catch (IOException e) {
+        logger.info("Creaing profile file: '{}'", dirName);
+        ClientProfile client = null;
+        try {
+            String internalVersion = versionName;
+            if (internalVersion.contains("-")) {
+                internalVersion = internalVersion.substring(0, versionName.indexOf('-'));
+            }
+            ClientProfile.Version version = ClientProfile.Version.byName(internalVersion);
+            if (version.compareTo(ClientProfile.Version.MC164) <= 0) {
+                logger.warn("Minecraft 1.6.4 and below not supported. Use at your own risk");
+            }
+            client = SaveProfilesCommand.makeProfile(version, dirName, SaveProfilesCommand.getMakeProfileOptionsFromDir(clientDir, version));
+        } catch (Throwable e) {
+            isMirrorClientDownload = true;
+        }
+        if (isMirrorClientDownload) {
             JsonElement clientJson = server.mirrorManager.jsonRequest(null, "GET", "clients/%s.json", versionName);
             client = Launcher.gsonManager.configGson.fromJson(clientJson, ClientProfile.class);
-        }
-        client.setTitle(dirName);
-        client.setDir(dirName);
-        client.setUUID(UUID.randomUUID());
-        if (client.getServers() != null) {
-            ClientProfile.ServerProfile serverProfile = client.getDefaultServerProfile();
-            if (serverProfile != null) {
-                serverProfile.name = dirName;
+            client.setTitle(dirName);
+            client.setDir(dirName);
+            client.setUUID(UUID.randomUUID());
+            if (client.getServers() != null) {
+                ClientProfile.ServerProfile serverProfile = client.getDefaultServerProfile();
+                if (serverProfile != null) {
+                    serverProfile.name = dirName;
+                }
             }
         }
         try (BufferedWriter writer = IOHelper.newWriter(IOHelper.resolveIncremental(server.profilesDir,
@@ -77,6 +94,6 @@ public final class DownloadClientCommand extends Command {
         // Finished
         server.syncProfilesDir();
         server.syncUpdatesDir(Collections.singleton(dirName));
-        LogHelper.subInfo("Client successfully downloaded: '%s'", dirName);
+        logger.info("Client successfully downloaded: '{}'", dirName);
     }
 }

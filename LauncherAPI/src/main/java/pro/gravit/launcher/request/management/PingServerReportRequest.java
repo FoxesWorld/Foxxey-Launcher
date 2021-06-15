@@ -6,6 +6,14 @@ import pro.gravit.launcher.request.Request;
 import java.util.List;
 
 public class PingServerReportRequest extends Request<PingServerReportRequestEvent> {
+    public final String name;
+    public final PingServerReport data;
+
+    public PingServerReportRequest(String name, PingServerReport data) {
+        this.name = name;
+        this.data = data;
+    }
+
     @Override
     public String getType() {
         return "pingServerReport";
@@ -15,15 +23,6 @@ public class PingServerReportRequest extends Request<PingServerReportRequestEven
         public final String name;
         public final int maxPlayers; // player slots
         public final int playersOnline;
-
-        public static class UsernameInfo {
-            public final String username;
-
-            public UsernameInfo(String username) {
-                this.username = username;
-            }
-        }
-
         //Server addional info
         public double tps; //Server tps
         public List<UsernameInfo> users;
@@ -33,13 +32,13 @@ public class PingServerReportRequest extends Request<PingServerReportRequestEven
             this.maxPlayers = maxPlayers;
             this.playersOnline = playersOnline;
         }
-    }
 
-    public final String name;
-    public final PingServerReport data;
+        public static class UsernameInfo {
+            public final String username;
 
-    public PingServerReportRequest(String name, PingServerReport data) {
-        this.name = name;
-        this.data = data;
+            public UsernameInfo(String username) {
+                this.username = username;
+            }
+        }
     }
 }

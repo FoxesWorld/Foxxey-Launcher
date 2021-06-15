@@ -14,6 +14,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.LaunchServerConfig;
 import pro.gravit.launchserver.socket.handlers.NettyIpForwardHandler;
@@ -21,7 +23,6 @@ import pro.gravit.launchserver.socket.handlers.NettyWebAPIHandler;
 import pro.gravit.launchserver.socket.handlers.WebSocketFrameHandler;
 import pro.gravit.launchserver.socket.handlers.fileserver.FileServerHandler;
 import pro.gravit.utils.BiHookSet;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -33,15 +34,16 @@ public class LauncherNettyServer implements AutoCloseable {
     public final EventLoopGroup workerGroup;
     public final WebSocketService service;
     public final BiHookSet<NettyConnectContext, SocketChannel> pipelineHook = new BiHookSet<>();
+    private transient final Logger logger = LogManager.getLogger();
 
     public LauncherNettyServer(LaunchServer server) {
         LaunchServerConfig.NettyConfig config = server.config.netty;
         NettyObjectFactory.setUsingEpoll(config.performance.usingEpoll);
         if (config.performance.usingEpoll) {
-            LogHelper.debug("Netty: Epoll enabled");
+            logger.debug("Netty: Epoll enabled");
         }
         if (config.performance.usingEpoll && !Epoll.isAvailable()) {
-            LogHelper.error("Epoll is not available: (netty,perfomance.usingEpoll configured wrongly)", Epoll.unavailabilityCause());
+            logger.error("Epoll is not available: (netty,perfomance.usingEpoll configured wrongly)", Epoll.unavailabilityCause());
         }
         bossGroup = NettyObjectFactory.newEventLoopGroup(config.performance.bossThread, "LauncherNettyServer.bossGroup");
         workerGroup = NettyObjectFactory.newEventLoopGroup(config.performance.workerThread, "LauncherNettyServer.workerGroup");
@@ -80,7 +82,5 @@ public class LauncherNettyServer implements AutoCloseable {
     public void close() {
         workerGroup.shutdownGracefully(2, 5, TimeUnit.SECONDS);
         bossGroup.shutdownGracefully(2, 5, TimeUnit.SECONDS);
-        //workerGroup.shutdownGracefully();
-        //bossGroup.shutdownGracefully();
     }
 }

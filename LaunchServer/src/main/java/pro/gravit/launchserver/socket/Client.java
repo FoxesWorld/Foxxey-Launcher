@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
     public UUID session;
+    public boolean useOAuth;
     public String auth_id;
     public long timestamp;
     public AuthResponse.ConnectTypes type;
@@ -28,7 +29,12 @@ public class Client {
 
     public transient AuthProviderPair auth;
 
+    @Deprecated
     public transient User daoObject;
+
+    public transient pro.gravit.launchserver.auth.core.User coreObject;
+
+    public transient pro.gravit.launchserver.auth.core.UserSession sessionObject;
 
     public transient Map<String, Object> properties;
 
@@ -57,22 +63,6 @@ public class Client {
         else auth = server.config.getAuthProviderPair(auth_id);
     }
 
-    @Deprecated
-    public enum Type {
-        SERVER,
-        USER
-    }
-
-    public static class TrustLevel {
-        public byte[] verifySecureKey;
-        public boolean keyChecked;
-        public byte[] publicKey;
-        public HardwareReportRequest.HardwareInfo hardwareInfo;
-        // May be used later
-        public double rating;
-        public long latestMillis;
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String name) {
         if (properties == null) properties = new HashMap<>();
@@ -92,5 +82,29 @@ public class Client {
     public void setSerializableProperty(String name, String value) {
         if (serializableProperties == null) serializableProperties = new HashMap<>();
         properties.put(name, value);
+    }
+
+    public pro.gravit.launchserver.auth.core.User getUser() {
+        if (coreObject != null) return coreObject;
+        if (auth != null && uuid != null && auth.isUseCore()) {
+            coreObject = auth.core.getUserByUUID(uuid);
+        }
+        return coreObject;
+    }
+
+    @Deprecated
+    public enum Type {
+        SERVER,
+        USER
+    }
+
+    public static class TrustLevel {
+        public byte[] verifySecureKey;
+        public boolean keyChecked;
+        public byte[] publicKey;
+        public HardwareReportRequest.HardwareInfo hardwareInfo;
+        // May be used later
+        public double rating;
+        public long latestMillis;
     }
 }

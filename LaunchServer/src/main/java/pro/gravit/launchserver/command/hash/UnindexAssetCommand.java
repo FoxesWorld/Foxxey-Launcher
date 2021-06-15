@@ -3,11 +3,12 @@ package pro.gravit.launchserver.command.hash;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.io.BufferedReader;
 import java.nio.file.Files;
@@ -16,6 +17,8 @@ import java.util.Collections;
 import java.util.Map;
 
 public final class UnindexAssetCommand extends Command {
+    private transient final Logger logger = LogManager.getLogger();
+
     public UnindexAssetCommand(LaunchServer server) {
         super(server);
     }
@@ -42,21 +45,21 @@ public final class UnindexAssetCommand extends Command {
             throw new CommandException("Indexed and unindexed asset dirs can't be same");
 
         // Create new asset dir
-        LogHelper.subInfo("Creating unindexed asset dir: '%s'", outputAssetDirName);
+        logger.info("Creating unindexed asset dir: '{}'", outputAssetDirName);
         Files.createDirectory(outputAssetDir);
 
         // Read JSON file
         JsonObject objects;
-        LogHelper.subInfo("Reading asset index file: '%s'", indexFileName);
+        logger.info("Reading asset index file: '{}'", indexFileName);
         try (BufferedReader reader = IOHelper.newReader(IndexAssetCommand.resolveIndexFile(inputAssetDir, indexFileName))) {
             objects = JsonParser.parseReader(reader).getAsJsonObject().get("objects").getAsJsonObject();
         }
 
         // Restore objects
-        LogHelper.subInfo("Unindexing %d objects", objects.size());
+        logger.info("Unindexing {} objects", objects.size());
         for (Map.Entry<String, JsonElement> member : objects.entrySet()) {
             String name = member.getKey();
-            LogHelper.subInfo("Unindexing: '%s'", name);
+            logger.info("Unindexing: '{}'", name);
 
             // Copy hashed file to target
             String hash = member.getValue().getAsJsonObject().get("hash").getAsString();
@@ -66,6 +69,6 @@ public final class UnindexAssetCommand extends Command {
 
         // Finished
         server.syncUpdatesDir(Collections.singleton(outputAssetDirName));
-        LogHelper.subInfo("Asset successfully unindexed: '%s'", inputAssetDirName);
+        logger.info("Asset successfully unindexed: '{}'", inputAssetDirName);
     }
 }

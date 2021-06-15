@@ -2,7 +2,6 @@ package pro.gravit.launchserver.binary.tasks;
 
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -55,9 +54,13 @@ public class AttachJarsTask implements LauncherBuildTask {
 
     private void attach(ZipOutputStream output, Path inputFile, List<Path> lst) throws IOException {
         for (Path p : lst) {
-            LogHelper.debug("Attaching: " + p);
-            AdditionalFixesApplyTask.apply(inputFile, p, output, srv, (e) -> exclusions.stream().anyMatch(e.getName()::startsWith), false);
+            AdditionalFixesApplyTask.apply(inputFile, p, output, srv, (e) -> filter(e.getName()), false);
         }
+    }
+
+    private boolean filter(String name) {
+        if (name.startsWith("META-INF/services")) return false;
+        return exclusions.stream().anyMatch(name::startsWith);
     }
 
     @Override

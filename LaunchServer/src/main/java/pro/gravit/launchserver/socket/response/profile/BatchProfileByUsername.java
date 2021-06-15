@@ -7,8 +7,6 @@ import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.SimpleResponse;
 
-import java.util.UUID;
-
 public class BatchProfileByUsername extends SimpleResponse {
     Entry[] list;
 
@@ -26,13 +24,11 @@ public class BatchProfileByUsername extends SimpleResponse {
         }
         result.playerProfiles = new PlayerProfile[list.length];
         for (int i = 0; i < list.length; ++i) {
-            UUID uuid;
             AuthProviderPair pair = client.auth;
             if (pair == null) {
                 pair = server.config.getAuthProviderPair();
             }
-            uuid = pair.handler.usernameToUUID(list[i].username);
-            result.playerProfiles[i] = ProfileByUUIDResponse.getProfile(uuid, list[i].username, list[i].client, pair.textureProvider);
+            result.playerProfiles[i] = server.authManager.getPlayerProfile(pair, list[i].username);
         }
         sendResult(result);
     }

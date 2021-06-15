@@ -1,5 +1,6 @@
 package pro.gravit.launcher.client;
 
+import pro.gravit.launcher.ClientLauncherWrapper;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.LauncherNetworkAPI;
@@ -7,6 +8,7 @@ import pro.gravit.launcher.client.events.client.ClientProcessBuilderCreateEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessBuilderLaunchedEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessBuilderParamsWrittedEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessBuilderPreLaunchEvent;
+import pro.gravit.launcher.events.request.AuthRequestEvent;
 import pro.gravit.launcher.hasher.HashedDir;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launcher.profiles.PlayerProfile;
@@ -30,6 +32,8 @@ import java.util.*;
 public class ClientLauncherProcess {
     public final ClientParams params = new ClientParams();
     public final List<String> jvmArgs = new LinkedList<>();
+    public final List<String> jvmModules = new LinkedList<>();
+    public final List<Path> jvmModulesPaths = new LinkedList<>();
     public final List<String> systemClientArgs = new LinkedList<>();
     public final List<String> systemClassPath = new LinkedList<>();
     public final Map<String, String> systemEnv = new HashMap<>();
@@ -41,6 +45,7 @@ public class ClientLauncherProcess {
     public int bits;
     public boolean useLegacyJavaClassPathProperty;
     public boolean isStarted;
+    public ClientLauncherWrapper.JavaVersion javaVersion;
     private transient Process process;
 
     public ClientLauncherProcess(Path executeFile, Path workDir, Path javaDir, String mainClass) {
@@ -81,6 +86,15 @@ public class ClientLauncherProcess {
         if (view != null) {
             this.params.actions = view.getEnabledActions();
         }
+        try {
+            javaVersion = ClientLauncherWrapper.JavaVersion.getByPath(javaDir);
+        } catch (IOException e) {
+            LogHelper.error(e);
+            javaVersion = null;
+        }
+        if (javaVersion == null) {
+            javaVersion = ClientLauncherWrapper.JavaVersion.getCurrentJavaVersion();
+        }
         this.bits = JVMHelper.JVM_BITS;
         applyClientProfile();
     }
@@ -105,7 +119,24 @@ public class ClientLauncherProcess {
         if (params.ram > 0) {
             this.jvmArgs.add("-Xmx" + params.ram + 'M');
         }
-        this.params.session = Request.getSession();
+        this.params.oauth = Request.getOAuth();
+        if (this.params.oauth == null) {
+            this.params.session = Request.getSession();
+        } else {
+            this.params.authId = Request.getAuthId();
+            this.params.oauthExpiredTime = Request.getTokenExpiredTime();
+            this.params.extendedTokens = Request.getExtendedTokens();
+        }
+
+        if (this.params.profile.getRuntimeInClientConfig() != ClientProfile.RuntimeInClientConfig.NONE) {
+            jvmModules.add("javafx.base");
+            jvmModules.add("javafx.graphics");
+            jvmModules.add("javafx.fxml");
+            jvmModules.add("javafx.controls");
+            jvmModules.add("javafx.swing");
+            jvmModules.add("javafx.media");
+            jvmModules.add("javafx.web");
+        }
         LauncherEngine.modulesManager.invokeEvent(new ClientProcessBuilderCreateEvent(this));
     }
 
@@ -116,8 +147,11 @@ public class ClientLauncherProcess {
         List<String> processArgs = new LinkedList<>();
         processArgs.add(executeFile.toString());
         processArgs.addAll(jvmArgs);
+        if (javaVersion.version >= 9) {
+            applyJava9Params(processArgs);
+        }
         //ADD CLASSPATH
-        if(params.profile.classLoaderConfig == ClientProfile.ClassLoaderConfig.AGENT) {
+        if (params.profile.getClassLoaderConfig() == ClientProfile.ClassLoaderConfig.AGENT) {
             processArgs.add("-javaagent:".concat(IOHelper.getCodeSource(ClientLauncherEntryPoint.class).toAbsolutePath().toString()));
         }
         if (useLegacyJavaClassPathProperty) {
@@ -148,6 +182,32 @@ public class ClientLauncherProcess {
         process = processBuilder.start();
         LauncherEngine.modulesManager.invokeEvent(new ClientProcessBuilderLaunchedEvent(this));
         isStarted = true;
+    }
+
+    private void applyJava9Params(List<String> processArgs) {
+        jvmModulesPaths.add(javaVersion.jvmDir);
+        jvmModulesPaths.add(javaVersion.jvmDir.resolve("jre"));
+        Path openjfxPath = ClientLauncherWrapper.tryGetOpenJFXPath(javaVersion.jvmDir);
+        if (openjfxPath != null) {
+            jvmModulesPaths.add(openjfxPath);
+        }
+        StringBuilder modulesPath = new StringBuilder();
+        StringBuilder modulesAdd = new StringBuilder();
+        for (String moduleName : jvmModules) {
+            boolean success = ClientLauncherWrapper.tryAddModule(jvmModulesPaths, moduleName, modulesPath);
+            if (success) {
+                if (modulesAdd.length() > 0) modulesAdd.append(",");
+                modulesAdd.append(moduleName);
+            }
+        }
+        if (modulesAdd.length() > 0) {
+            processArgs.add("--add-modules");
+            processArgs.add(modulesAdd.toString());
+        }
+        if (modulesPath.length() > 0) {
+            processArgs.add("--module-path");
+            processArgs.add(modulesPath.toString());
+        }
     }
 
     public void runWriteParams(SocketAddress address) throws IOException {
@@ -210,6 +270,14 @@ public class ClientLauncherProcess {
         //========
 
         public UUID session;
+
+        public AuthRequestEvent.OAuthRequestEvent oauth;
+
+        public String authId;
+
+        public long oauthExpiredTime;
+
+        public Map<String, String> extendedTokens;
 
         public transient HashedDir assetHDir;
 

@@ -17,15 +17,15 @@ import pro.gravit.launcher.profiles.optional.actions.OptionalAction;
 import pro.gravit.launcher.request.Request;
 import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.request.auth.AuthRequest;
-import pro.gravit.launcher.request.auth.RestoreSessionRequest;
+import pro.gravit.launcher.request.auth.GetAvailabilityAuthRequest;
 import pro.gravit.launcher.request.websockets.StdWebSocketService;
 import pro.gravit.launcher.utils.NativeJVMHalt;
 import pro.gravit.utils.helper.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.security.*;
-import java.security.cert.CertificateException;
+import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -39,14 +39,16 @@ public class LauncherEngine {
     public static ClientLauncherProcess.ClientParams clientParams;
     public static LauncherGuardInterface guard;
     public static ClientModuleManager modulesManager;
+    public final boolean clientInstance;
     // Instance
     private final AtomicBoolean started = new AtomicBoolean(false);
     public RuntimeProvider runtimeProvider;
     public ECPublicKey publicKey;
     public ECPrivateKey privateKey;
 
-    private LauncherEngine() {
+    private LauncherEngine(boolean clientInstance) {
 
+        this.clientInstance = clientInstance;
     }
 
     //JVMHelper.getCertificates
@@ -102,7 +104,7 @@ public class LauncherEngine {
         Launcher.getConfig(); // init config
         long startTime = System.currentTimeMillis();
         try {
-            new LauncherEngine().start(args);
+            new LauncherEngine(false).start(args);
         } catch (Exception e) {
             LogHelper.error(e);
             return;
@@ -116,6 +118,7 @@ public class LauncherEngine {
 
     public static void initGson(ClientModuleManager modulesManager) {
         AuthRequest.registerProviders();
+        GetAvailabilityAuthRequest.registerProviders();
         OptionalAction.registerProviders();
         Launcher.gsonManager = new ClientGsonManager(modulesManager);
         Launcher.gsonManager.initGson();
@@ -137,7 +140,11 @@ public class LauncherEngine {
     }
 
     public static LauncherEngine clientInstance() {
-        return new LauncherEngine();
+        return new LauncherEngine(true);
+    }
+
+    public static LauncherEngine newInstance(boolean clientInstance) {
+        return new LauncherEngine(clientInstance);
     }
 
     public void readKeys() throws IOException, InvalidKeySpecException {
@@ -147,11 +154,11 @@ public class LauncherEngine {
         Path privateKeyFile = dir.resolve("private.key");
         if (IOHelper.isFile(publicKeyFile) && IOHelper.isFile(privateKeyFile)) {
             LogHelper.info("Reading EC keypair");
-            publicKey = SecurityHelper.toPublicECKey(IOHelper.read(publicKeyFile));
-            privateKey = SecurityHelper.toPrivateECKey(IOHelper.read(privateKeyFile));
+            publicKey = SecurityHelper.toPublicECDSAKey(IOHelper.read(publicKeyFile));
+            privateKey = SecurityHelper.toPrivateECDSAKey(IOHelper.read(privateKeyFile));
         } else {
             LogHelper.info("Generating EC keypair");
-            KeyPair pair = SecurityHelper.genECKeyPair(new SecureRandom());
+            KeyPair pair = SecurityHelper.genECDSAKeyPair(new SecureRandom());
             publicKey = (ECPublicKey) pair.getPublic();
             privateKey = (ECPrivateKey) pair.getPrivate();
 
@@ -169,7 +176,7 @@ public class LauncherEngine {
         LauncherEngine.modulesManager.invokeEvent(event);
         runtimeProvider = event.runtimeProvider;
         if (runtimeProvider == null) runtimeProvider = new NoRuntimeProvider();
-        runtimeProvider.init(false);
+        runtimeProvider.init(clientInstance);
         //runtimeProvider.preLoad();
         if (Request.service == null) {
             String address = Launcher.getConfig().address;
@@ -179,19 +186,13 @@ public class LauncherEngine {
             {
                 LogHelper.debug("WebSocket connect closed. Try reconnect");
                 try {
-                    Request.service.open();
-                    LogHelper.debug("Connect to %s", Launcher.getConfig().address);
+                    Request.reconnect();
                 } catch (Exception e) {
                     LogHelper.error(e);
-                    throw new RequestException(String.format("Connect error: %s", e.getMessage() != null ? e.getMessage() : "null"));
-                }
-                try {
-                    RestoreSessionRequest request1 = new RestoreSessionRequest(Request.getSession());
-                    request1.request();
-                } catch (Exception e) {
-                    LogHelper.error(e);
+                    throw new RequestException("Connection failed", e);
                 }
             };
+            Request.service.registerEventHandler(new BasicLauncherEventHandler());
         }
         Objects.requireNonNull(args, "args");
         if (started.getAndSet(true))
@@ -199,7 +200,7 @@ public class LauncherEngine {
         readKeys();
         LauncherEngine.modulesManager.invokeEvent(new ClientEngineInitPhase(this));
         runtimeProvider.preLoad();
-        LauncherGuardManager.initGuard(false);
+        LauncherGuardManager.initGuard(clientInstance);
         LogHelper.debug("Dir: %s", DirBridge.dir);
         runtimeProvider.run(args);
     }
