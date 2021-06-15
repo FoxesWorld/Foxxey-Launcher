@@ -233,7 +233,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
             });
             logger.debug("Init components successful");
         }
-
+        logger.info("LaunchServer config file reload success!");
     }
 
     @Override
