@@ -8,7 +8,7 @@ __FoxesWorld__ launcher
   - Add optional server settings
   - Add VK group parser
   - HWID scanner and recorder
-  - Include __FoxesWorld__ libraries
+  - Include __FoxesWorld__ libraries - `foxesSound`, `startUpSound`
 
   **WAS DONE**
   - ServerLauncher reload
