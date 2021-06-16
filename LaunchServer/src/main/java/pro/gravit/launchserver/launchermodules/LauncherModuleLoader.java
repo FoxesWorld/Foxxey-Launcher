@@ -46,6 +46,7 @@ public class LauncherModuleLoader {
             }
         }
         server.commandHandler.registerCommand("syncLauncherModules", new SyncLauncherModulesCommand(this));
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
         MainBuildTask mainTask = server.launcherBinary.getTaskByClass(MainBuildTask.class).get();
         mainTask.preBuildHook.registerHook((buildContext) -> {
             for (ModuleEntity e : launcherModules) {

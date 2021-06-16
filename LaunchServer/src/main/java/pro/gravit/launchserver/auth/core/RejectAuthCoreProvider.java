@@ -21,7 +21,7 @@ public class RejectAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
+    public UserSession getUserSessionByOAuthAccessToken(String accessToken) {
         return null;
     }
 
@@ -41,7 +41,7 @@ public class RejectAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    public AuthManager.AuthReport createOAuthSession(User user, AuthResponse.AuthContext context, PasswordVerifyReport report, boolean minecraftAccess) throws IOException {
+    public AuthManager.AuthReport createOAuthSession(User user, AuthResponse.AuthContext context, PasswordVerifyReport report, boolean minecraftAccess) {
         return null;
     }
 

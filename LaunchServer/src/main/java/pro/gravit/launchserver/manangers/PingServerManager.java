@@ -27,6 +27,7 @@ public class PingServerManager {
         });
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean updateServer(String name, PingServerReportRequest.PingServerReport report) {
         ServerInfoEntry entry = map.get(name);
         if (entry == null)
@@ -43,6 +44,7 @@ public class PingServerManager {
         public PingServerReportRequest.PingServerReport lastReport;
         public long lastReportTime;
 
+        @SuppressWarnings("unused")
         public ServerInfoEntry(ClientProfile profile, PingServerReportRequest.PingServerReport lastReport) {
             this.lastReport = lastReport;
             this.profile = profile;

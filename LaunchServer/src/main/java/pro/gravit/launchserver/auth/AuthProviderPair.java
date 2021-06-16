@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AuthProviderPair {
-    public final boolean isDefault = true;
+public final class AuthProviderPair {
+    public boolean isDefault = true;
     public AuthProvider provider;
     public AuthHandler handler;
     public TextureProvider textureProvider;
@@ -30,7 +30,37 @@ public class AuthProviderPair {
         this.textureProvider = textureProvider;
     }
 
-    public void init(LaunchServer srv, String name) {
+    @SuppressWarnings("unused")
+    public static Set<String> getFeatures(Class<?> clazz) {
+        Set<String> list = new HashSet<>();
+        getFeatures(clazz, list);
+        return list;
+    }
+
+    public static void getFeatures(Class<?> clazz, Set<String> list) {
+        Features features = clazz.getAnnotation(Features.class);
+        if (features != null) {
+            for (Feature feature : features.value()) {
+                list.add(feature.value());
+            }
+        }
+        Class<?> superClass = clazz.getSuperclass();
+        if (superClass != null && superClass != Object.class) {
+            getFeatures(superClass, list);
+        }
+        Class<?>[] interfaces = clazz.getInterfaces();
+        for (Class<?> i : interfaces) {
+            getFeatures(i, list);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public final <T> T isSupport(Class<T> clazz) {
+        if (core == null) return null;
+        return core.isSupport(clazz);
+    }
+
+    public final void init(LaunchServer srv, String name) {
         this.name = name;
         if (links != null) link(srv);
         if (core == null) {
@@ -53,7 +83,7 @@ public class AuthProviderPair {
         }
     }
 
-    public void link(LaunchServer srv) {
+    public final void link(LaunchServer srv) {
         links.forEach((k, v) -> {
             AuthProviderPair pair = srv.config.getAuthProviderPair(v);
             if (pair == null) {
@@ -79,7 +109,7 @@ public class AuthProviderPair {
         });
     }
 
-    public void close() throws IOException {
+    public final void close() throws IOException {
         if (social != null) {
             social.close();
         }
@@ -94,38 +124,16 @@ public class AuthProviderPair {
         }
     }
 
-    public static Set<String> getFeatures(Class<?> clazz) {
-        Set<String> list = new HashSet<>();
-        getFeatures(clazz, list);
-        return list;
-    }
-
-    public static void getFeatures(Class<?> clazz, Set<String> list) {
-        Features features = clazz.getAnnotation(Features.class);
-        if (features != null) {
-            for (Feature feature : features.value()) {
-                list.add(feature.value());
-            }
-        }
-        Class<?> superClass = clazz.getSuperclass();
-        if (superClass != null && superClass != Object.class) {
-            getFeatures(superClass, list);
-        }
-        Class<?>[] interfaces = clazz.getInterfaces();
-        for (Class<?> i : interfaces) {
-            getFeatures(i, list);
-        }
-    }
-
-    public boolean isUseCore() {
+    public final boolean isUseCore() {
         return core != null;
     }
 
-    public boolean isUseSocial() {
+    public final boolean isUseSocial() {
         return core != null && social != null;
     }
 
-    public boolean isUseProviderAndHandler() {
+    @SuppressWarnings("unused")
+    public final boolean isUseProviderAndHandler() {
         return !isUseCore();
     }
 }

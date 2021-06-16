@@ -83,7 +83,6 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
         } else if ((frame instanceof PongWebSocketFrame)) {
             logger.trace("WebSocket Client received pong");
         } else if ((frame instanceof CloseWebSocketFrame)) {
-            int statusCode = ((CloseWebSocketFrame) frame).statusCode();
             ctx.channel().close();
         } else {
             String message = "unsupported frame type: " + frame.getClass().getName();

@@ -32,6 +32,7 @@ public class LogAppender extends AbstractAppender {
     }
 
     @PluginFactory
+    @SuppressWarnings("unused")
     public static LogAppender createAppender(
             @PluginAttribute("name") String name,
             @PluginElement("Layout") Layout<? extends Serializable> layout,

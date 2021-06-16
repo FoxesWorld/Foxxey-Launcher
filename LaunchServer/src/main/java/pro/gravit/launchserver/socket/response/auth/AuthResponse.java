@@ -1,8 +1,6 @@
 package pro.gravit.launchserver.socket.response.auth;
 
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.events.request.AuthRequestEvent;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launchserver.auth.AuthException;
@@ -15,7 +13,6 @@ import pro.gravit.utils.HookException;
 import java.util.UUID;
 
 public class AuthResponse extends SimpleResponse {
-    private transient final Logger logger = LogManager.getLogger();
     public String login;
     public String client;
     public boolean getSession;

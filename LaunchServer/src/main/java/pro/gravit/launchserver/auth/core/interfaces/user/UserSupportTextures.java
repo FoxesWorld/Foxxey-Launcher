@@ -8,10 +8,12 @@ public interface UserSupportTextures {
 
     Texture getCloakTexture();
 
+    @SuppressWarnings("unused")
     default Texture getSkinTexture(ClientProfile profile) {
         return getSkinTexture();
     }
 
+    @SuppressWarnings("unused")
     default Texture getCloakTexture(ClientProfile profile) {
         return getCloakTexture();
     }

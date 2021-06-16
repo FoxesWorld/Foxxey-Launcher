@@ -9,7 +9,7 @@ import pro.gravit.launchserver.helper.DamerauHelper;
 
 import java.util.Arrays;
 
-public interface AuthSupportHardware {
+public interface AuthSupportHardware extends AuthSupport {
     UserHardware getHardwareInfoByPublicKey(byte[] publicKey);
 
     UserHardware getHardwareInfoByData(HardwareReportRequest.HardwareInfo info);
@@ -32,6 +32,7 @@ public interface AuthSupportHardware {
         return (UserSupportHardware) user;
     }
 
+    @SuppressWarnings("unused")
     default void normalizeHardwareInfo(HardwareReportRequest.HardwareInfo hardwareInfo) {
         if (hardwareInfo.baseboardSerialNumber != null)
             hardwareInfo.baseboardSerialNumber = hardwareInfo.baseboardSerialNumber.trim();

@@ -140,13 +140,19 @@ public class ServerWrapper extends JsonConfigurable<ServerWrapper.Config> {
         if (config.logFile != null) LogHelper.addOutput(IOHelper.newWriter(Paths.get(config.logFile), true));
         {
             if (config.saveSession) {
+                boolean needRestore = false;
                 if (config.oauth != null) {
                     Request.setOAuth(config.auth_id, config.oauth, config.oauthExpireTime);
-                } else {
+                    needRestore = true;
+                } else if (config.session != null) {
                     Request.setSession(config.session);
+                    needRestore = true;
+                } else {
+                    auth();
                 }
                 try {
-                    Request.restore();
+                    if (needRestore)
+                        Request.restore();
                 } catch (Exception e) {
                     LogHelper.error(e);
                     auth();
@@ -218,9 +224,9 @@ public class ServerWrapper extends JsonConfigurable<ServerWrapper.Config> {
                 System.arraycopy(args, 1, real_args, 0, args.length - 1);
             } else real_args = args;
 
-            mainMethod.invoke(real_args);
+            mainMethod.invoke((Object) real_args);
         } else {
-            mainMethod.invoke(config.args);
+            mainMethod.invoke((Object) config.args);
         }
     }
 
@@ -285,6 +291,7 @@ public class ServerWrapper extends JsonConfigurable<ServerWrapper.Config> {
         public LauncherConfig.LauncherEnvironment env;
     }
 
+    @SuppressWarnings("unused")
     public static final class WebSocketConf {
     }
 }

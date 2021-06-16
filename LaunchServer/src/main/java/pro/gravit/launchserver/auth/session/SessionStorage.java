@@ -33,12 +33,16 @@ public abstract class SessionStorage {
 
     public abstract void clear();
 
+    @SuppressWarnings("unused")
     public abstract void lockSession(UUID sessionUUID);
 
+    @SuppressWarnings("unused")
     public abstract void lockUser(UUID userUUID);
 
+    @SuppressWarnings("unused")
     public abstract void unlockSession(UUID sessionUUID);
 
+    @SuppressWarnings("unused")
     public abstract void unlockUser(UUID userUUID);
 
     public void init(LaunchServer server) {

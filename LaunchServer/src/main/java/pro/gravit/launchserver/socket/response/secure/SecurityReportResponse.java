@@ -8,10 +8,15 @@ import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.SimpleResponse;
 
 public class SecurityReportResponse extends SimpleResponse {
+    @SuppressWarnings("unused")
     public String reportType;
+    @SuppressWarnings("unused")
     public String smallData;
+    @SuppressWarnings("unused")
     public String largeData;
+    @SuppressWarnings("unused")
     public byte[] smallBytes;
+    @SuppressWarnings("unused")
     public byte[] largeBytes;
 
     @Override

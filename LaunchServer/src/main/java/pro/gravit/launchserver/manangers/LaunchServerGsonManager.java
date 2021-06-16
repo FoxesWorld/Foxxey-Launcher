@@ -34,7 +34,6 @@ public class LaunchServerGsonManager extends GsonManager {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void registerAdapters(GsonBuilder builder) {
         super.registerAdapters(builder);
         builder.registerTypeAdapter(AuthProvider.class, new UniversalJsonAdapter<>(AuthProvider.providers));
@@ -54,6 +53,5 @@ public class LaunchServerGsonManager extends GsonManager {
         builder.registerTypeAdapter(OptionalAction.class, new UniversalJsonAdapter<>(OptionalAction.providers));
         builder.registerTypeAdapter(SessionStorage.class, new UniversalJsonAdapter<>(SessionStorage.providers));
         modulesManager.invokeEvent(new PreGsonPhase(builder));
-        //ClientWebSocketService.appendTypeAdapters(builder);
     }
 }

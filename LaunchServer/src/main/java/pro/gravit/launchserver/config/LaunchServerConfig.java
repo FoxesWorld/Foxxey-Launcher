@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.LauncherConfig;
-import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.handler.MemoryAuthHandler;
@@ -23,7 +22,6 @@ import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.components.RegLimiterComponent;
 import pro.gravit.launchserver.dao.provider.DaoProvider;
 import pro.gravit.launchserver.socket.response.auth.ClientProfileProvider;
-import pro.gravit.launchserver.socket.response.auth.MysqlClientProfileProvider;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
 
@@ -41,7 +39,6 @@ public final class LaunchServerConfig {
     public boolean cacheUpdates = true;
     public LauncherConfig.LauncherEnvironment env;
     public Map<String, AuthProviderPair> auth;
-    @Deprecated
     public DaoProvider dao;
     public SessionStorage sessions;
     // Handlers & Providers
@@ -56,7 +53,7 @@ public final class LaunchServerConfig {
     private transient LaunchServer server = null;
     private transient AuthProviderPair authDefault;
 
-    public static LaunchServerConfig getDefault(LaunchServer.LaunchServerEnv env) {
+    public static LaunchServerConfig getDefault(@SuppressWarnings("unused") LaunchServer.LaunchServerEnv env) {
         LaunchServerConfig newConfig = new LaunchServerConfig();
         newConfig.mirrors = new String[]{"https://mirror.gravit.pro/", "https://gravit-launcher-mirror.storage.googleapis.com/"};
         newConfig.launch4j = new LaunchServerConfig.ExeConf();
@@ -147,10 +144,12 @@ public final class LaunchServerConfig {
         this.projectName = projectName;
     }
 
+    @SuppressWarnings("unused")
     public void setBinaryName(String binaryName) {
         this.binaryName = binaryName;
     }
 
+    @SuppressWarnings("unused")
     public void setEnv(LauncherConfig.LauncherEnvironment env) {
         this.env = env;
     }

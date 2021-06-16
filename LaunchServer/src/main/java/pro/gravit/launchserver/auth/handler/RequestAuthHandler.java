@@ -88,4 +88,24 @@ public final class RequestAuthHandler extends CachedAuthHandler {
     @Override
     public void close() {
     }
+
+    @SuppressWarnings("unused")
+    public void setUsernameFetch(String usernameFetch) {
+        this.usernameFetch = usernameFetch;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUuidFetch(String uuidFetch) {
+        this.uuidFetch = uuidFetch;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUpdateAuth(String updateAuth) {
+        this.updateAuth = updateAuth;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUpdateServerID(String updateServerID) {
+        this.updateServerID = updateServerID;
+    }
 }

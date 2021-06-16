@@ -187,6 +187,7 @@ public class WebSocketService {
         ctx.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, WebSocketEvent.class)), ctx.voidPromise());
     }
 
+    @SuppressWarnings("unused")
     public void sendObject(ChannelHandlerContext ctx, Object obj, Type type) {
         ctx.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, type)), ctx.voidPromise());
     }
@@ -195,10 +196,12 @@ public class WebSocketService {
         channel.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, WebSocketEvent.class)), channel.voidPromise());
     }
 
+    @SuppressWarnings("unused")
     public void sendObject(Channel channel, Object obj, Type type) {
         channel.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, type)), channel.voidPromise());
     }
 
+    @SuppressWarnings("unused")
     public void sendObjectAll(Object obj) {
         for (Channel ch : channels) {
             ch.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, WebSocketEvent.class)), ch.voidPromise());
@@ -211,6 +214,7 @@ public class WebSocketService {
         }
     }
 
+    @SuppressWarnings("unused")
     public void sendObjectToUUID(UUID userUuid, Object obj, Type type) {
         for (Channel ch : channels) {
             if (ch == null || ch.pipeline() == null) continue;
@@ -235,6 +239,7 @@ public class WebSocketService {
         }
     }
 
+    @SuppressWarnings("unused")
     public Channel getChannelFromConnectUUID(UUID connectUuid) {
         for (Channel ch : channels) {
             if (ch == null || ch.pipeline() == null) continue;
@@ -247,6 +252,7 @@ public class WebSocketService {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public boolean kickByUserUUID(UUID userUuid, boolean isClose) {
         boolean result = false;
         for (Channel ch : channels) {
@@ -262,6 +268,7 @@ public class WebSocketService {
         return result;
     }
 
+    @SuppressWarnings("unused")
     public boolean kickByConnectUUID(UUID connectUuid, boolean isClose) {
         for (Channel ch : channels) {
             if (ch == null || ch.pipeline() == null) continue;
@@ -276,6 +283,7 @@ public class WebSocketService {
         return false;
     }
 
+    @SuppressWarnings("unused")
     public boolean kickByIP(String ip, boolean isClose) {
         boolean result = false;
         for (Channel ch : channels) {
@@ -298,10 +306,12 @@ public class WebSocketService {
         ctx.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, WebSocketEvent.class))).addListener(ChannelFutureListener.CLOSE);
     }
 
+    @SuppressWarnings("unused")
     public void sendObjectAndClose(ChannelHandlerContext ctx, Object obj, Type type) {
         ctx.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, type))).addListener(ChannelFutureListener.CLOSE);
     }
 
+    @SuppressWarnings("unused")
     public void sendEvent(EventResult obj) {
         channels.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj)), ChannelMatchers.all(), true);
     }

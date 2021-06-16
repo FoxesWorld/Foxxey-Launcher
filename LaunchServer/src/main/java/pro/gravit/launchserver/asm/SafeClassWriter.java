@@ -24,6 +24,7 @@ public class SafeClassWriter extends ClassWriter {
         this.classMetadataReader = classMetadataReader;
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     protected String getCommonSuperClass(String type1, String type2) {
         ArrayList<String> superClasses1 = classMetadataReader.getSuperClasses(type1);

@@ -4,7 +4,7 @@ import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.socket.Client;
 
 public interface ProfilesProtectHandler {
-    default boolean canGetProfiles(Client client) {
+    default boolean canGetProfiles(@SuppressWarnings("unused") Client client) {
         return true;
     }
 

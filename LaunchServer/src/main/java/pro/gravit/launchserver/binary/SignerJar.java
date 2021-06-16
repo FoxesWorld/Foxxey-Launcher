@@ -11,10 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -69,9 +66,9 @@ public class SignerJar implements AutoCloseable {
      *
      * @param filename name of the file to add (use forward slash as a path separator)
      * @param contents contents of the file
-     * @throws IOException
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    @SuppressWarnings("unused")
     public void addFileContents(String filename, byte[] contents) throws IOException {
         addFileContents(filename, new ByteArrayInputStream(contents));
     }
@@ -82,7 +79,6 @@ public class SignerJar implements AutoCloseable {
      *
      * @param filename name of the file to add (use forward slash as a path separator)
      * @param contents contents of the file
-     * @throws IOException
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     public void addFileContents(String filename, InputStream contents) throws IOException {
@@ -95,9 +91,9 @@ public class SignerJar implements AutoCloseable {
      *
      * @param entry    name of the file to add (use forward slash as a path separator)
      * @param contents contents of the file
-     * @throws IOException
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    @SuppressWarnings("unused")
     public void addFileContents(ZipEntry entry, byte[] contents) throws IOException {
         addFileContents(entry, new ByteArrayInputStream(contents));
     }
@@ -108,7 +104,6 @@ public class SignerJar implements AutoCloseable {
      *
      * @param entry    name of the file to add (use forward slash as a path separator)
      * @param contents contents of the file
-     * @throws IOException
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     public void addFileContents(ZipEntry entry, InputStream contents) throws IOException {
@@ -134,7 +129,6 @@ public class SignerJar implements AutoCloseable {
      * Closes the JAR file by writing the manifest and signature data to it and finishing the ZIP entries. It closes the
      * underlying stream.
      *
-     * @throws IOException
      * @throws RuntimeException if the signing goes wrong
      */
     @Override
@@ -148,7 +142,6 @@ public class SignerJar implements AutoCloseable {
      * Finishes the JAR file by writing the manifest and signature data to it and finishing the ZIP entries. It leaves the
      * underlying stream open.
      *
-     * @throws IOException
      * @throws RuntimeException if the signing goes wrong
      */
     public void finish() throws IOException {
@@ -158,6 +151,7 @@ public class SignerJar implements AutoCloseable {
         zos.finish();
     }
 
+    @SuppressWarnings("unused")
     public ZipOutputStream getZos() {
         return zos;
     }
@@ -177,7 +171,7 @@ public class SignerJar implements AutoCloseable {
         manifest.write(o);
         byte[] ob = o.toByteArray();
         ob = Arrays.copyOfRange(ob, emptyLen, ob.length);
-        return Base64.getEncoder().encodeToString(SignHelper.hasher().digest(ob));
+        return Base64.getEncoder().encodeToString(Objects.requireNonNull(SignHelper.hasher()).digest(ob));
     }
 
     /**
@@ -205,7 +199,6 @@ public class SignerJar implements AutoCloseable {
      * Writes the manifest to the JAR. It also calculates the digests that are required to be placed in the the signature
      * file.
      *
-     * @throws IOException
      */
     private void writeManifest() throws IOException {
         zos.putNextEntry(IOHelper.newZipEntry(MANIFEST_FN));
@@ -268,7 +261,6 @@ public class SignerJar implements AutoCloseable {
     /**
      * Signs the .SIG file and writes the signature (.RSA file) to the JAR.
      *
-     * @throws IOException
      * @throws RuntimeException if the signing failed
      */
     private void writeSignature(byte[] sigFile) throws IOException {

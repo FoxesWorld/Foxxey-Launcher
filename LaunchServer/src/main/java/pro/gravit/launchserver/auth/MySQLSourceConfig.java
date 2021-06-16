@@ -27,23 +27,28 @@ public final class MySQLSourceConfig implements AutoCloseable {
     // Config
     private String address;
     private int port;
+    @SuppressWarnings("unused")
     private boolean useSSL;
+    @SuppressWarnings("unused")
     private boolean verifyCertificates;
     private String username;
     private String password;
     private String database;
+    @SuppressWarnings("unused")
     private String timezone;
+    @SuppressWarnings("unused")
     private boolean enableHikari;
 
     // Cache
     private transient DataSource source;
     private transient boolean hikari;
 
-
+    @SuppressWarnings("unused")
     public MySQLSourceConfig(String poolName) {
         this.poolName = poolName;
     }
 
+    @SuppressWarnings("unused")
     public MySQLSourceConfig(String poolName, String address, int port, String username, String password, String database) {
         this.poolName = poolName;
         this.address = address;
@@ -53,6 +58,7 @@ public final class MySQLSourceConfig implements AutoCloseable {
         this.database = database;
     }
 
+    @SuppressWarnings("unused")
     public MySQLSourceConfig(String poolName, DataSource source, boolean hikari) {
         this.poolName = poolName;
         this.source = source;

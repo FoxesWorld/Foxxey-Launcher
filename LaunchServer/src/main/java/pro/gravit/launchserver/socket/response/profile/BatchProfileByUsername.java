@@ -35,6 +35,7 @@ public class BatchProfileByUsername extends SimpleResponse {
 
     static class Entry {
         String username;
+        @SuppressWarnings("unused")
         String client;
     }
 }

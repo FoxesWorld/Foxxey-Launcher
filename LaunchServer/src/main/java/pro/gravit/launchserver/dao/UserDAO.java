@@ -3,8 +3,8 @@ package pro.gravit.launchserver.dao;
 import java.util.List;
 import java.util.UUID;
 
-@Deprecated
 public interface UserDAO {
+    @SuppressWarnings("unused")
     User findById(int id);
 
     User findByUsername(String username);
@@ -15,6 +15,7 @@ public interface UserDAO {
 
     void update(User user);
 
+    @SuppressWarnings("unused")
     void delete(User user);
 
     List<User> findAll();

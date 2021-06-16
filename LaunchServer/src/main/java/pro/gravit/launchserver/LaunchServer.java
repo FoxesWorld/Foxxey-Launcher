@@ -88,9 +88,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
      * This object contains runtime configuration
      */
     public final LaunchServerRuntimeConfig runtime;
-    @Deprecated
     public final ECPublicKey publicKey;
-    @Deprecated
     public final ECPrivateKey privateKey;
     /**
      * Pipeline for building JAR
@@ -246,9 +244,6 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
                     return;
                 }
                 switch (args[0]) {
-                    case "full":
-                        reload(ReloadType.FULL);
-                        break;
                     case "no_auth":
                         reload(ReloadType.NO_AUTH);
                         break;
@@ -457,6 +452,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
     public interface LaunchServerConfigManager {
         LaunchServerConfig readConfig() throws IOException;
 
+        @SuppressWarnings("unused")
         LaunchServerRuntimeConfig readRuntimeConfig() throws IOException;
 
         void writeConfig(LaunchServerConfig config) throws IOException;
@@ -464,6 +460,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
         void writeRuntimeConfig(LaunchServerRuntimeConfig config) throws IOException;
     }
 
+    @SuppressWarnings("unused")
     private static final class ProfilesFileVisitor extends SimpleFileVisitor<Path> {
         private final Collection<ClientProfile> result;
         private final Logger logger = LogManager.getLogger();

@@ -37,6 +37,7 @@ public abstract class LauncherBinary extends BinaryPipeline {
     public void init() {
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public final boolean sync() throws IOException {
         boolean exists = exists();
         digest = exists ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.SHA512, IOHelper.read(syncBinaryFile)) : null;

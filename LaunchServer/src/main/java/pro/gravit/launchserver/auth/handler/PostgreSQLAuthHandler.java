@@ -115,4 +115,49 @@ public final class PostgreSQLAuthHandler extends CachedAuthHandler {
             throw new IOException(e);
         }
     }
+
+    @SuppressWarnings("unused")
+    public void setPostgreSQLHolder(PostgreSQLSourceConfig postgreSQLHolder) {
+        this.postgreSQLHolder = postgreSQLHolder;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUuidColumn(String uuidColumn) {
+        this.uuidColumn = uuidColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUsernameColumn(String usernameColumn) {
+        this.usernameColumn = usernameColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAccessTokenColumn(String accessTokenColumn) {
+        this.accessTokenColumn = accessTokenColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setServerIDColumn(String serverIDColumn) {
+        this.serverIDColumn = serverIDColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setQueryByUUIDSQL(String queryByUUIDSQL) {
+        this.queryByUUIDSQL = queryByUUIDSQL;
+    }
+
+    @SuppressWarnings("unused")
+    public void setQueryByUsernameSQL(String queryByUsernameSQL) {
+        this.queryByUsernameSQL = queryByUsernameSQL;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUpdateAuthSQL(String updateAuthSQL) {
+        this.updateAuthSQL = updateAuthSQL;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUpdateServerIDSQL(String updateServerIDSQL) {
+        this.updateServerIDSQL = updateServerIDSQL;
+    }
 }

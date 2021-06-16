@@ -11,6 +11,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
+import org.jetbrains.annotations.NotNull;
 import pro.gravit.utils.helper.IOHelper;
 
 import java.io.IOException;
@@ -107,13 +108,13 @@ public class SignHelper {
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
+        public void write(@NotNull byte[] b) throws IOException {
             out.write(b);
             hasher.update(b);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(@NotNull byte[] b, int off, int len) throws IOException {
             out.write(b, off, len);
             hasher.update(b, off, len);
         }

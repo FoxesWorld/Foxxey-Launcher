@@ -23,15 +23,18 @@ public class SessionManager implements NeedGarbageCollection {
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean addClient(Client client) {
         if (client == null || client.session == null) return false;
         return server.config.sessions.writeSession(client.uuid, client.session, compressClient(client));
     }
 
+    @SuppressWarnings("unused")
     public Stream<UUID> findSessionsByUUID(UUID uuid) {
         return server.config.sessions.getSessionsFromUserUUID(uuid);
     }
 
+    @SuppressWarnings("unused")
     public boolean removeByUUID(UUID uuid) {
         return server.config.sessions.deleteSessionsByUserUUID(uuid);
     }
@@ -83,7 +86,7 @@ public class SessionManager implements NeedGarbageCollection {
         return restoreFromString(data);
     }
 
-
+    @SuppressWarnings("unused")
     public Client getOrNewClient(UUID session) {
         Client client = getClient(session);
         return client == null ? new Client(session) : client;
@@ -99,7 +102,7 @@ public class SessionManager implements NeedGarbageCollection {
     }
 
     @Deprecated
-    public void updateClient(UUID session) {
+    public void updateClient(@SuppressWarnings("unused") UUID session) {
         throw new UnsupportedOperationException();
     }
 
@@ -109,8 +112,7 @@ public class SessionManager implements NeedGarbageCollection {
     }
 
     @Deprecated
-    public void loadSessions(Set<Client> set) {
+    public void loadSessions(@SuppressWarnings("unused") Set<Client> set) {
         throw new UnsupportedOperationException();
-        //clientSet.putAll(set.stream().collect(Collectors.toMap(c -> c.session, Function.identity())));
     }
 }

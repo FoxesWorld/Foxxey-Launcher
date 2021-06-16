@@ -29,24 +29,27 @@ public class NettyWebAPIHandler extends SimpleChannelInboundHandler<FullHttpRequ
         this.context = context;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static SeverletPathPair addNewSeverlet(String path, SimpleSeverletHandler callback) {
         SeverletPathPair pair = new SeverletPathPair("/webapi/".concat(path), callback);
         severletList.add(pair);
         return pair;
     }
 
+    @SuppressWarnings("unused")
     public static SeverletPathPair addUnsafeSeverlet(String path, SimpleSeverletHandler callback) {
         SeverletPathPair pair = new SeverletPathPair(path, callback);
         severletList.add(pair);
         return pair;
     }
 
+    @SuppressWarnings("unused")
     public static void removeSeverlet(SeverletPathPair pair) {
         severletList.remove(pair);
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
         boolean isNext = true;
         for (SeverletPathPair pair : severletList) {
             if (msg.uri().startsWith(pair.key)) {
@@ -78,8 +81,8 @@ public class NettyWebAPIHandler extends SimpleChannelInboundHandler<FullHttpRequ
             String sub = uri.substring(ind + 1);
             String[] result = sub.split("&");
             Map<String, String> map = new HashMap<>();
-            for (int i = 0; i < result.length; ++i) {
-                String c = URLDecoder.decode(result[i], Charset.defaultCharset());
+            for (String s : result) {
+                String c = URLDecoder.decode(s, Charset.defaultCharset());
                 int index = c.indexOf("=");
                 if (index <= 0) {
                     continue;

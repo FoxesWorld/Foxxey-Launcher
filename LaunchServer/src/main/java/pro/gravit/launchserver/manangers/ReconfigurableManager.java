@@ -21,6 +21,7 @@ public class ReconfigurableManager {
         RECONFIGURABLE.remove(name.toLowerCase());
     }
 
+    @SuppressWarnings("unused")
     public void call(String name, String action, String[] args) throws Exception {
         Command commands = RECONFIGURABLE.get(name);
         if (commands == null) throw new CommandException(String.format("Reconfigurable %s not found", name));
@@ -29,6 +30,7 @@ public class ReconfigurableManager {
         command.invoke(args);
     }
 
+    @SuppressWarnings("unused")
     public void printHelp(String name) throws CommandException {
         Command commands = RECONFIGURABLE.get(name);
         if (commands == null) throw new CommandException(String.format("Reconfigurable %s not found", name));

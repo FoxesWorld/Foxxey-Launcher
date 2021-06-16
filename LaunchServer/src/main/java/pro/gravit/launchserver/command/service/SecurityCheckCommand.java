@@ -12,7 +12,6 @@ import pro.gravit.launchserver.auth.provider.AcceptAuthProvider;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.config.LaunchServerConfig;
-import pro.gravit.launchserver.socket.response.auth.MysqlClientProfileProvider;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -37,7 +36,8 @@ public class SecurityCheckCommand extends Command {
     }
 
     @Deprecated
-    public static void printCheckResult(LogHelper.Level level, String module, String comment, Boolean status) {
+    public static void printCheckResult(@SuppressWarnings("unused") LogHelper.Level level, String module,
+                                        String comment, Boolean status) {
         printCheckResult(module, comment, status);
     }
 
@@ -198,21 +198,18 @@ public class SecurityCheckCommand extends Command {
         //Linux permissions check
         if (JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
             try {
-                int uid = 0, gid = 0;
                 String[] status = new String(IOHelper.read(Paths.get("/proc/self/status"))).split("\n");
                 for (String line : status) {
                     String[] parts = line.split(":");
                     if (parts.length == 0) continue;
                     if (parts[0].trim().equalsIgnoreCase("Uid")) {
                         String[] words = parts[1].trim().split(" ");
-                        uid = Integer.parseInt(words[0]);
                         if (Integer.parseInt(words[0]) == 0 || Integer.parseInt(words[0]) == 0) {
                             logger.error("The process is started as root! It is not recommended");
                         }
                     }
                     if (parts[0].trim().equalsIgnoreCase("Gid")) {
                         String[] words = parts[1].trim().split(" ");
-                        gid = Integer.parseInt(words[0]);
                         if (Integer.parseInt(words[0]) == 0 || Integer.parseInt(words[0]) == 0) {
                             logger.error("The process is started as root group! It is not recommended");
                         }

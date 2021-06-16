@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 public class NettyThreadFactory extends DefaultThreadFactory {
     private transient final Logger logger = LogManager.getLogger();
 
+    @SuppressWarnings("unused")
     public NettyThreadFactory(String poolName) {
         super(poolName);
     }

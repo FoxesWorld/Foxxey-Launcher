@@ -40,6 +40,7 @@ public class BinaryPipeline {
         indexes.forEach(e -> tasks.set(tasks.indexOf(e) + count, taskRep));
     }
 
+    @SuppressWarnings("unused")
     public void addPre(Predicate<LauncherBuildTask> pred, LauncherBuildTask taskAdd) {
         addCounted(-1, pred, taskAdd);
     }
@@ -52,6 +53,7 @@ public class BinaryPipeline {
         addCounted(1, pred, taskAdd);
     }
 
+    @SuppressWarnings("unused")
     public void replacePre(Predicate<LauncherBuildTask> pred, LauncherBuildTask taskRep) {
         replaceCounted(-1, pred, taskRep);
     }
@@ -60,10 +62,12 @@ public class BinaryPipeline {
         replaceCounted(0, pred, taskRep);
     }
 
+    @SuppressWarnings("unused")
     public void replaceAfter(Predicate<LauncherBuildTask> pred, LauncherBuildTask taskRep) {
         replaceCounted(1, pred, taskRep);
     }
 
+    @SuppressWarnings("unused")
     public <T extends LauncherBuildTask> List<T> getTasksByClass(Class<T> taskClass) {
         return tasks.stream().filter(taskClass::isInstance).map(taskClass::cast).collect(Collectors.toList());
     }

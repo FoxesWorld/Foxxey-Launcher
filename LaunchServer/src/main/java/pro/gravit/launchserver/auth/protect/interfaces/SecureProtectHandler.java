@@ -29,7 +29,8 @@ public interface SecureProtectHandler {
 
     boolean allowGetSecureLevelInfo(Client client);
 
-    default SecurityReportRequestEvent onSecurityReport(SecurityReportResponse report, Client client) {
+    default SecurityReportRequestEvent onSecurityReport(@SuppressWarnings("unused") SecurityReportResponse report,
+                                                        @SuppressWarnings("unused") Client client) {
         return new SecurityReportRequestEvent();
     }
 

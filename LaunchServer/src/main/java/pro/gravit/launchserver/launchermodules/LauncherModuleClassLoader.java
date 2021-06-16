@@ -12,6 +12,7 @@ public class LauncherModuleClassLoader extends URLClassLoader {
         super.addURL(u);
     }
 
+    @SuppressWarnings("unused")
     public Class<?> rawDefineClass(String name, byte[] bytes) {
         return defineClass(name, bytes, 0, bytes.length);
     }

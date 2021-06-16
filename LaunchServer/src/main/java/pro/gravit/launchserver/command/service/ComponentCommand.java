@@ -33,6 +33,7 @@ public class ComponentCommand extends Command {
         return "component manager";
     }
 
+    @SuppressWarnings("unused")
     public void printHelp() {
         logger.info("Print help for component:");
         logger.info("component unload [componentName]");

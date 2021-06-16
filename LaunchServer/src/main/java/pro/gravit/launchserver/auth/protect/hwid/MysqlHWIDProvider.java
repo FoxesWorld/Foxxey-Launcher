@@ -15,7 +15,6 @@ import java.sql.*;
 public class MysqlHWIDProvider extends HWIDProvider {
     private transient final Logger logger = LogManager.getLogger();
     public MySQLSourceConfig mySQLHolder;
-    public double warningSpoofingLevel = -1.0;
     public double criticalCompareLevel = 1.0;
     public String tableHWID = "hwids";
     public String tableHWIDLog = "hwidLog";

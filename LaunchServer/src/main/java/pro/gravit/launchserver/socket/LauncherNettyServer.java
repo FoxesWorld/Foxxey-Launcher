@@ -34,11 +34,11 @@ public class LauncherNettyServer implements AutoCloseable {
     public final EventLoopGroup workerGroup;
     public final WebSocketService service;
     public final BiHookSet<NettyConnectContext, SocketChannel> pipelineHook = new BiHookSet<>();
-    private transient final Logger logger = LogManager.getLogger();
 
     public LauncherNettyServer(LaunchServer server) {
         LaunchServerConfig.NettyConfig config = server.config.netty;
         NettyObjectFactory.setUsingEpoll(config.performance.usingEpoll);
+        Logger logger = LogManager.getLogger();
         if (config.performance.usingEpoll) {
             logger.debug("Netty: Epoll enabled");
         }
@@ -74,6 +74,7 @@ public class LauncherNettyServer implements AutoCloseable {
                 });
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public ChannelFuture bind(InetSocketAddress address) {
         return serverBootstrap.bind(address);
     }

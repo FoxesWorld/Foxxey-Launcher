@@ -15,7 +15,7 @@ public class NettyObjectFactory {
         epoll = value;
     }
 
-    public static EventLoopGroup newEventLoopGroup(int threads, String poolName) {
+    public static EventLoopGroup newEventLoopGroup(int threads, @SuppressWarnings("unused") String poolName) {
         if (epoll)
             return new EpollEventLoopGroup(threads);
         else

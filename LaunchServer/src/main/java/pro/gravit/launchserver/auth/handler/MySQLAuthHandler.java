@@ -107,4 +107,34 @@ public final class MySQLAuthHandler extends CachedAuthHandler {
             throw new IOException(e);
         }
     }
+
+    @SuppressWarnings("unused")
+    public void setMySQLHolder(MySQLSourceConfig mySQLHolder) {
+        this.mySQLHolder = mySQLHolder;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUuidColumn(String uuidColumn) {
+        this.uuidColumn = uuidColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUsernameColumn(String usernameColumn) {
+        this.usernameColumn = usernameColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAccessTokenColumn(String accessTokenColumn) {
+        this.accessTokenColumn = accessTokenColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setServerIDColumn(String serverIDColumn) {
+        this.serverIDColumn = serverIDColumn;
+    }
+
+    @SuppressWarnings("unused")
+    public void setTable(String table) {
+        this.table = table;
+    }
 }

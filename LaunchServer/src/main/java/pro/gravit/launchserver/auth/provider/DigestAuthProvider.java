@@ -4,6 +4,7 @@ import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.utils.helper.SecurityHelper;
 import pro.gravit.utils.helper.SecurityHelper.DigestAlgorithm;
 
+@SuppressWarnings("unused")
 public abstract class DigestAuthProvider extends AuthProvider {
     private DigestAlgorithm digest;
 

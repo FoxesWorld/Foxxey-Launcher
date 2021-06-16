@@ -23,7 +23,7 @@ public class ProfilesResponse extends SimpleResponse {
             sendError("Access denied");
             return;
         }
-        
+
         List<ClientProfile> profileList;
         Set<ClientProfile> serverProfiles = server.getProfiles();
         if (server.config.protectHandler instanceof ProfilesProtectHandler) {

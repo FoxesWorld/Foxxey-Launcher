@@ -53,6 +53,7 @@ public class Client {
     }
 
     //Данные авторизации
+    @SuppressWarnings("unused")
     public void up() {
         timestamp = System.currentTimeMillis();
     }
@@ -63,22 +64,25 @@ public class Client {
         else auth = server.config.getAuthProviderPair(auth_id);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     public <T> T getProperty(String name) {
         if (properties == null) properties = new HashMap<>();
         return (T) properties.get(name);
     }
 
+    @SuppressWarnings("unused")
     public <T> void setProperty(String name, T object) {
         if (properties == null) properties = new HashMap<>();
         properties.put(name, object);
     }
 
+    @SuppressWarnings("unused")
     public String getSerializableProperty(String name) {
         if (serializableProperties == null) serializableProperties = new HashMap<>();
         return serializableProperties.get(name);
     }
 
+    @SuppressWarnings("unused")
     public void setSerializableProperty(String name, String value) {
         if (serializableProperties == null) serializableProperties = new HashMap<>();
         properties.put(name, value);
@@ -104,7 +108,9 @@ public class Client {
         public byte[] publicKey;
         public HardwareReportRequest.HardwareInfo hardwareInfo;
         // May be used later
+        @SuppressWarnings("unused")
         public double rating;
+        @SuppressWarnings("unused")
         public long latestMillis;
     }
 }

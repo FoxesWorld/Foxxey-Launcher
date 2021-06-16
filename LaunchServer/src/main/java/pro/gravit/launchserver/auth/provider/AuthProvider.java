@@ -45,7 +45,7 @@ public abstract class AuthProvider implements AutoCloseable {
         return GetAvailabilityAuthRequestEvent.AuthAvailability.AuthType.NONE;
     }
 
-    public List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client) {
+    public List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(@SuppressWarnings("unused") Client client) {
         return List.of(new AuthPasswordDetails());
     }
 
@@ -61,7 +61,9 @@ public abstract class AuthProvider implements AutoCloseable {
      */
     public abstract AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception;
 
-    public void preAuth(String login, AuthRequest.AuthPasswordInterface password, String ip) {
+    public void preAuth(@SuppressWarnings("unused") String login,
+                        @SuppressWarnings("unused") AuthRequest.AuthPasswordInterface password,
+                        @SuppressWarnings("unused") String ip) {
     }
 
     @Override

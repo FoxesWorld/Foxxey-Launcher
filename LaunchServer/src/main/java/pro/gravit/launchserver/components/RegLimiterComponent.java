@@ -13,6 +13,7 @@ public class RegLimiterComponent extends IPLimiter implements NeedGarbageCollect
     public transient LaunchServer launchServer;
     public String message;
 
+    @SuppressWarnings("unused")
     public List<String> excludeIps = new ArrayList<>();
 
     @Override

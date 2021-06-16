@@ -18,7 +18,7 @@ public abstract class Component {
         }
     }
 
-    @Deprecated
+    @SuppressWarnings("unused")
     public void preInit(LaunchServer launchServer) {
 
     }
@@ -29,7 +29,7 @@ public abstract class Component {
         this.componentName = s;
     }
 
-    @Deprecated
+    @SuppressWarnings("unused")
     public void postInit(LaunchServer launchServer) {
 
     }

@@ -53,6 +53,7 @@ public class CertificateManager {
     public X509CertificateHolder ca;
     public AsymmetricKeyParameter caKey;
     public X509CertificateHolder server;
+    @SuppressWarnings("unused")
     public AsymmetricKeyParameter serverKey;
     public LauncherTrustManager trustManager;
     public String orgName;

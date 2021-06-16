@@ -20,8 +20,8 @@ public class KeyAgreementManager {
     public final ECPrivateKey ecdsaPrivateKey;
     public final RSAPublicKey rsaPublicKey;
     public final RSAPrivateKey rsaPrivateKey;
-    private transient final Logger logger = LogManager.getLogger();
 
+    @SuppressWarnings("unused")
     public KeyAgreementManager(ECPublicKey ecdsaPublicKey, ECPrivateKey ecdsaPrivateKey, RSAPublicKey rsaPublicKey, RSAPrivateKey rsaPrivateKey) {
         this.ecdsaPublicKey = ecdsaPublicKey;
         this.ecdsaPrivateKey = ecdsaPrivateKey;
@@ -31,6 +31,7 @@ public class KeyAgreementManager {
 
     public KeyAgreementManager(Path keyDirectory) throws IOException, InvalidKeySpecException {
         Path ecdsaPublicKeyPath = keyDirectory.resolve("ecdsa_id.pub"), ecdsaPrivateKeyPath = keyDirectory.resolve("ecdsa_id");
+        Logger logger = LogManager.getLogger();
         if (IOHelper.isFile(ecdsaPublicKeyPath) && IOHelper.isFile(ecdsaPrivateKeyPath)) {
             logger.info("Reading ECDSA keypair");
             ecdsaPublicKey = SecurityHelper.toPublicECDSAKey(IOHelper.read(ecdsaPublicKeyPath));

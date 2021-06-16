@@ -7,7 +7,6 @@ import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launcher.request.secure.HardwareReportRequest;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.MySQLSourceConfig;
 import pro.gravit.launchserver.auth.core.interfaces.UserHardware;
 import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportHardware;
@@ -39,20 +38,16 @@ public class MySQLCoreProvider extends AuthCoreProvider implements AuthSupportHa
     public String table;
 
     public String tableHWID = "hwids";
-    public String tableHWIDLog = "hwidLog";
+    public PasswordVerifier passwordVerifier;
+    public double criticalCompareLevel = 1.0;
     private transient String sqlFindHardwareByPublicKey;
     private transient String sqlFindHardwareByData;
     private transient String sqlFindHardwareById;
     private transient String sqlCreateHardware;
-    private transient String sqlCreateHWIDLog;
     private transient String sqlUpdateHardwarePublicKey;
     private transient String sqlUpdateHardwareBanned;
     private transient String sqlUpdateUsers;
     private transient String sqlUsersByHwidId;
-
-    public PasswordVerifier passwordVerifier;
-    public double criticalCompareLevel = 1.0;
-
     // Prepared SQL queries
     private transient String queryByUUIDSQL;
     private transient String queryByUsernameSQL;
@@ -80,7 +75,7 @@ public class MySQLCoreProvider extends AuthCoreProvider implements AuthSupportHa
     }
 
     @Override
-    public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
+    public UserSession getUserSessionByOAuthAccessToken(String accessToken) {
         return null;
     }
 
@@ -90,7 +85,7 @@ public class MySQLCoreProvider extends AuthCoreProvider implements AuthSupportHa
     }
 
     @Override
-    public void verifyAuth(AuthResponse.AuthContext context) throws AuthException {
+    public void verifyAuth(AuthResponse.AuthContext context) {
 
     }
 
@@ -140,7 +135,6 @@ public class MySQLCoreProvider extends AuthCoreProvider implements AuthSupportHa
         sqlUsersByHwidId = String.format("SELECT %s FROM %s WHERE `%s` = ?", userInfoCols, table, hardwareIdColumn);
         sqlFindHardwareByData = String.format("SELECT %s FROM %s", hardwareInfoCols, tableHWID);
         sqlCreateHardware = String.format("INSERT INTO `%s` (`publickey`, `hwDiskId`, `baseboardSerialNumber`, `displayId`, `bitness`, `totalMemory`, `logicalProcessors`, `physicalProcessors`, `processorMaxFreq`, `battery`, `graphicCard`, `banned`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')", tableHWID);
-        sqlCreateHWIDLog = String.format("INSERT INTO %s (`hwidId`, `newPublicKey`) VALUES (?, ?)", tableHWIDLog);
         sqlUpdateHardwarePublicKey = String.format("UPDATE %s SET `publicKey` = ? WHERE `id` = ?", tableHWID);
         sqlUpdateHardwareBanned = String.format("UPDATE %s SET `banned` = ? WHERE `id` = ?", tableHWID);
         sqlUpdateUsers = String.format("UPDATE %s SET `%s` = ? WHERE `%s` = ?", table, hardwareIdColumn, uuidColumn);
@@ -379,6 +373,40 @@ public class MySQLCoreProvider extends AuthCoreProvider implements AuthSupportHa
         }
     }
 
+    public static class MySQLUserHardware implements UserHardware {
+        private final HardwareReportRequest.HardwareInfo hardwareInfo;
+        private byte[] publicKey;
+        private final long id;
+        private boolean banned;
+
+        public MySQLUserHardware(HardwareReportRequest.HardwareInfo hardwareInfo, byte[] publicKey, long id, boolean banned) {
+            this.hardwareInfo = hardwareInfo;
+            this.publicKey = publicKey;
+            this.id = id;
+            this.banned = banned;
+        }
+
+        @Override
+        public HardwareReportRequest.HardwareInfo getHardwareInfo() {
+            return hardwareInfo;
+        }
+
+        @Override
+        public byte[] getPublicKey() {
+            return publicKey;
+        }
+
+        @Override
+        public String getId() {
+            return String.valueOf(id);
+        }
+
+        @Override
+        public boolean isBanned() {
+            return banned;
+        }
+    }
+
     public class MySQLUser implements User, UserSupportHardware {
         protected UUID uuid;
         protected String username;
@@ -430,40 +458,6 @@ public class MySQLCoreProvider extends AuthCoreProvider implements AuthSupportHa
             MySQLUserHardware result = (MySQLUserHardware) getHardwareInfoById(String.valueOf(hwidId));
             hardware = result;
             return result;
-        }
-    }
-
-    public static class MySQLUserHardware implements UserHardware {
-        private HardwareReportRequest.HardwareInfo hardwareInfo;
-        private byte[] publicKey;
-        private long id;
-        private boolean banned;
-
-        public MySQLUserHardware(HardwareReportRequest.HardwareInfo hardwareInfo, byte[] publicKey, long id, boolean banned) {
-            this.hardwareInfo = hardwareInfo;
-            this.publicKey = publicKey;
-            this.id = id;
-            this.banned = banned;
-        }
-
-        @Override
-        public HardwareReportRequest.HardwareInfo getHardwareInfo() {
-            return hardwareInfo;
-        }
-
-        @Override
-        public byte[] getPublicKey() {
-            return publicKey;
-        }
-
-        @Override
-        public String getId() {
-            return String.valueOf(id);
-        }
-
-        @Override
-        public boolean isBanned() {
-            return banned;
         }
     }
 }

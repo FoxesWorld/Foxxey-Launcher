@@ -8,7 +8,6 @@ import pro.gravit.launchserver.dao.User;
 import pro.gravit.launchserver.manangers.hook.AuthHookManager;
 import pro.gravit.utils.helper.SecurityHelper;
 
-@Deprecated
 public class HibernateAuthProvider extends AuthProvider implements RequiredDAO {
     public boolean autoReg;
 
@@ -18,9 +17,7 @@ public class HibernateAuthProvider extends AuthProvider implements RequiredDAO {
         User user = srv.config.dao.userDAO.findByUsername(login);
         if (user == null && autoReg) {
             AuthHookManager.RegContext context = new AuthHookManager.RegContext(login, ((AuthPlainPassword) password).password, ip, false);
-            if (srv.authHookManager.registraion.hook(context)) {
-                //user = srv.config.dao.userService.registerNewUser(login, ((AuthPlainPassword) password).password); //TODO: FIX
-            } else {
+            if (!srv.authHookManager.registraion.hook(context)) {
                 throw new AuthException("Registration canceled. Try again later");
             }
         }

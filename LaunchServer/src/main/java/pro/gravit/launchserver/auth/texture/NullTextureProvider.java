@@ -31,7 +31,7 @@ public final class NullTextureProvider extends TextureProvider {
         return getProvider().getSkinTexture(uuid, username, client);
     }
 
-
+    @SuppressWarnings("unused")
     public void setBackend(TextureProvider provider) {
         this.provider = provider;
     }

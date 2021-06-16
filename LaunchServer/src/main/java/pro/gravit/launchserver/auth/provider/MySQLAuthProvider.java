@@ -52,4 +52,29 @@ public final class MySQLAuthProvider extends AuthProvider {
     public void close() {
         mySQLHolder.close();
     }
+
+    @SuppressWarnings("unused")
+    public void setMySQLHolder(MySQLSourceConfig mySQLHolder) {
+        this.mySQLHolder = mySQLHolder;
+    }
+
+    @SuppressWarnings("unused")
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @SuppressWarnings("unused")
+    public void setQueryParams(String[] queryParams) {
+        this.queryParams = queryParams;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFlagsEnabled(boolean flagsEnabled) {
+        this.flagsEnabled = flagsEnabled;
+    }
 }

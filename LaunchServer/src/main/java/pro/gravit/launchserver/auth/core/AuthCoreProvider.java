@@ -155,26 +155,28 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
                 }
             }
         });
-        if (this instanceof AuthSupportGetAllUsers) {
-            AuthSupportGetAllUsers instance = (AuthSupportGetAllUsers) this;
-            map.put("getallusers", new SubCommand("(limit)", "print all users information") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    int max = Integer.MAX_VALUE;
-                    if (args.length > 0) max = Integer.parseInt(args[0]);
-                    Iterable<User> users = instance.getAllUsers();
-                    int counter = 0;
-                    for (User u : users) {
-                        logger.info("User {}", u.toString());
-                        counter++;
-                        if (counter == max) break;
+        {
+            var instance = isSupport(AuthSupportGetAllUsers.class);
+            if (instance != null) {
+                map.put("getallusers", new SubCommand("(limit)", "print all users information") {
+                    @Override
+                    public void invoke(String... args) {
+                        int max = Integer.MAX_VALUE;
+                        if (args.length > 0) max = Integer.parseInt(args[0]);
+                        Iterable<User> users = instance.getAllUsers();
+                        int counter = 0;
+                        for (User u : users) {
+                            logger.info("User {}", u.toString());
+                            counter++;
+                            if (counter == max) break;
+                        }
+                        logger.info("Found {} users", counter);
                     }
-                    logger.info("Found {} users", counter);
-                }
-            });
+                });
+            }
         }
-        if (this instanceof AuthSupportHardware) {
-            AuthSupportHardware instance = (AuthSupportHardware) this;
+        {
+            var instance = isSupport(AuthSupportHardware.class);
             map.put("gethardwarebyid", new SubCommand("[id]", "get hardware by id") {
                 @Override
                 public void invoke(String... args) throws Exception {
@@ -280,7 +282,7 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
         return map;
     }
 
-    public User checkServer(Client client, String username, String serverID) throws IOException {
+    public User checkServer(@SuppressWarnings("unused") Client client, String username, String serverID) throws IOException {
         User user = getUserByUsername(username);
         if (user.getUsername().equals(username) && user.getServerId().equals(serverID)) {
             return user;
@@ -294,10 +296,17 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
         return user.getUsername().equals(username) && user.getAccessToken().equals(accessToken) && updateServerID(user, serverID);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T isSupport(Class<T> clazz) {
+        if (clazz.isAssignableFrom(getClass())) return (T) this;
+        return null;
+    }
+
     @Override
     public abstract void close() throws IOException;
 
     public static class PasswordVerifyReport {
+        @SuppressWarnings("unused")
         public static final PasswordVerifyReport REQUIRED_2FA = new PasswordVerifyReport(-1);
         public static final PasswordVerifyReport FAILED = new PasswordVerifyReport(false);
         public static final PasswordVerifyReport OK = new PasswordVerifyReport(true);
@@ -317,12 +326,14 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
             this.factors = List.of(nextFactor);
         }
 
+        @SuppressWarnings("unused")
         public PasswordVerifyReport(List<Integer> factors) {
             this.success = false;
             this.needMoreFactor = false;
             this.factors = Collections.unmodifiableList(factors);
         }
 
+        @SuppressWarnings("unused")
         private PasswordVerifyReport(boolean success, boolean needMoreFactor, List<Integer> factors) {
             this.success = success;
             this.needMoreFactor = needMoreFactor;
@@ -334,10 +345,12 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
         public OAuthAccessTokenExpired() {
         }
 
+        @SuppressWarnings("unused")
         public OAuthAccessTokenExpired(String message) {
             super(message);
         }
 
+        @SuppressWarnings("unused")
         public OAuthAccessTokenExpired(String message, Throwable cause) {
             super(message, cause);
         }

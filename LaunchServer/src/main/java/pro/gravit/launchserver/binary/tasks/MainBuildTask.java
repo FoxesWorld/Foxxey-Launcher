@@ -63,7 +63,6 @@ public class MainBuildTask implements LauncherBuildTask {
             for (Path e : server.launcherBinary.coreLibs) {
                 reader.getCp().add(new JarFile(e.toFile()));
             }
-            ;
             context.pushJarFile(inputJar, (e) -> blacklist.contains(e.getName()), (e) -> true);
 
             // map for guard
@@ -94,6 +93,7 @@ public class MainBuildTask implements LauncherBuildTask {
             }
         }).collect(Collectors.toList());
         if (!server.config.sign.enabled) {
+            @SuppressWarnings("OptionalGetWithoutIsPresent")
             CertificateAutogenTask task = server.launcherBinary.getTaskByClass(CertificateAutogenTask.class).get();
             try {
                 certificates.add(task.certificate.getEncoded());
@@ -195,6 +195,7 @@ public class MainBuildTask implements LauncherBuildTask {
             list.add(hook);
         }
 
+        @SuppressWarnings("unused")
         public boolean unregisterHook(IOHook<R> hook) {
             return list.remove(hook);
         }
@@ -221,6 +222,7 @@ public class MainBuildTask implements LauncherBuildTask {
         }
     }
 
+    @SuppressWarnings("unused")
     public abstract static class ASMAnnotationFieldProcessor implements ASMTransformer {
         private final String desc;
 

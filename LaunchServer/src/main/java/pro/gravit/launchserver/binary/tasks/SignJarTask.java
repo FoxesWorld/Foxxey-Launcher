@@ -68,7 +68,6 @@ public class SignJarTask implements LauncherBuildTask {
         try (SignerJar output = new SignerJar(new ZipOutputStream(IOHelper.newOutput(signedFile)), () -> SignJarTask.gen(config, c),
                 config.metaInfSfName, config.metaInfKeyName);
              ZipInputStream input = new ZipInputStream(IOHelper.newInput(inputFile))) {
-            //input.getManifest().getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString())); // may not work such as after Radon.
             ZipEntry e = input.getNextEntry();
             while (e != null) {
                 if ("META-INF/MANIFEST.MF".equals(e.getName()) || "/META-INF/MANIFEST.MF".equals(e.getName())) {
@@ -85,12 +84,12 @@ public class SignJarTask implements LauncherBuildTask {
 
     private void autoSign(Path inputFile, Path signedFile) throws IOException {
         try (SignerJar output = new SignerJar(new ZipOutputStream(IOHelper.newOutput(signedFile)), () -> {
+            @SuppressWarnings("OptionalGetWithoutIsPresent")
             CertificateAutogenTask task = srv.launcherBinary.getTaskByClass(CertificateAutogenTask.class).get();
             return task.signedDataGenerator;
         },
                 "AUTOGEN.SF", "AUTOGEN.EC");
              ZipInputStream input = new ZipInputStream(IOHelper.newInput(inputFile))) {
-            //input.getManifest().getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString())); // may not work such as after Radon.
             ZipEntry e = input.getNextEntry();
             while (e != null) {
                 if ("META-INF/MANIFEST.MF".equals(e.getName()) || "/META-INF/MANIFEST.MF".equals(e.getName())) {

@@ -169,6 +169,7 @@ public class ProGuardComponent extends Component implements AutoCloseable, Recon
         public static final String[] JAVA9_OPTS = new String[]{
                 "-libraryjars '<java.home>/jmods/'"
         };
+        @SuppressWarnings("unused")
         public static final String[] JAVA8_OPTS = new String[]{
                 "-libraryjars '<java.home>/lib/rt.jar'",
                 "-libraryjars '<java.home>/lib/jce.jar'",
@@ -192,7 +193,8 @@ public class ProGuardComponent extends Component implements AutoCloseable, Recon
             this.srv = srv;
         }
 
-        private static String generateString(SecureRandom rand, String lowString, String upString, int il) {
+        private static String generateString(SecureRandom rand, String lowString, String upString,
+                                             @SuppressWarnings("SameParameterValue") int il) {
             StringBuilder sb = new StringBuilder(Math.max(il, lowString.length()));
             for (int i = 0; i < lowString.length(); ++i) {
                 sb.append(rand.nextBoolean() ? lowString.charAt(i) : upString.charAt(i));

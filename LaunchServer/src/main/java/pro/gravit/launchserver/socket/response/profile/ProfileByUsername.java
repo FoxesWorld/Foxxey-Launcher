@@ -9,6 +9,7 @@ import pro.gravit.launchserver.socket.response.SimpleResponse;
 
 public class ProfileByUsername extends SimpleResponse {
     String username;
+    @SuppressWarnings("unused")
     String client;
 
     @Override

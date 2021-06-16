@@ -96,6 +96,7 @@ public abstract class AbstractLimiter<T> extends Component implements NeedGarbag
         long time;
         int trys;
 
+        @SuppressWarnings("unused")
         public LimitEntry(long time, int trys) {
             this.time = time;
             this.trys = trys;

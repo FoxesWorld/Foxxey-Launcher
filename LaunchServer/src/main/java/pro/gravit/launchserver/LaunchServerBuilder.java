@@ -96,6 +96,7 @@ public class LaunchServerBuilder {
         return this;
     }
 
+    @SuppressWarnings("unused")
     public void setKeyAgreementManager(KeyAgreementManager keyAgreementManager) {
         this.keyAgreementManager = keyAgreementManager;
     }

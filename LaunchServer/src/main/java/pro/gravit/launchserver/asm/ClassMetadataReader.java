@@ -20,6 +20,7 @@ import java.util.jar.JarFile;
 public class ClassMetadataReader implements Closeable {
     private final List<JarFile> cp;
 
+    @SuppressWarnings("unused")
     public ClassMetadataReader(List<JarFile> cp) {
         this.cp = cp;
     }

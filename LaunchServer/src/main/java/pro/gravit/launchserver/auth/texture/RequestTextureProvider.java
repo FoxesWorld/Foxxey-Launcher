@@ -14,6 +14,7 @@ public final class RequestTextureProvider extends TextureProvider {
     private String skinURL;
     private String cloakURL;
 
+    @SuppressWarnings("unused")
     public RequestTextureProvider() {
     }
 

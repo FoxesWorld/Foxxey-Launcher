@@ -15,6 +15,7 @@ import java.util.List;
 
 public abstract class AuthSocialProvider implements AutoCloseable {
     public static final ProviderMap<AuthSocialProvider> providers = new ProviderMap<>("AuthSocialProvider");
+    @SuppressWarnings("unused")
     private static final Logger logger = LogManager.getLogger();
     private static boolean registredProviders = false;
 
@@ -23,6 +24,15 @@ public abstract class AuthSocialProvider implements AutoCloseable {
             registredProviders = true;
         }
     }
+
+    public abstract void init(LaunchServer server, AuthCoreProvider provider);
+
+    public abstract List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client);
+
+    public abstract SocialResult preAuth(AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password) throws AuthException;
+
+    @Override
+    public abstract void close() throws IOException;
 
     public static class SocialResult {
         public String login;
@@ -35,21 +45,14 @@ public abstract class AuthSocialProvider implements AutoCloseable {
             this.user = user;
         }
 
+        @SuppressWarnings("unused")
         public static SocialResult ofLoginAndPassword(String login, AuthRequest.AuthPasswordInterface password) {
             return new SocialResult(login, password, null);
         }
 
+        @SuppressWarnings("unused")
         public static SocialResult ofUser(User user) {
             return new SocialResult(null, null, user);
         }
     }
-
-    public abstract void init(LaunchServer server, AuthCoreProvider provider);
-
-    public abstract List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client);
-
-    public abstract SocialResult preAuth(AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password) throws AuthException;
-
-    @Override
-    public abstract void close() throws IOException;
 }

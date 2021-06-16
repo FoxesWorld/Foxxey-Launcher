@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class CurrentUserResponse extends SimpleResponse {
-    @Deprecated
+
     public static CurrentUserRequestEvent.UserInfo collectUserInfoFromClient(Client client) throws IOException {
         CurrentUserRequestEvent.UserInfo result = new CurrentUserRequestEvent.UserInfo();
         if (client.auth != null && client.isAuth && client.username != null) {
@@ -24,7 +24,7 @@ public class CurrentUserResponse extends SimpleResponse {
         return result;
     }
 
-    public static CurrentUserRequestEvent.UserInfo collectUserInfoFromClient(LaunchServer server, Client client) throws IOException {
+    public static CurrentUserRequestEvent.UserInfo collectUserInfoFromClient(LaunchServer server, Client client) {
         CurrentUserRequestEvent.UserInfo result = new CurrentUserRequestEvent.UserInfo();
         if (client.auth != null && client.isAuth && client.username != null) {
             result.playerProfile = server.authManager.getPlayerProfile(client);

@@ -22,6 +22,7 @@ public final class NodeUtils {
     private NodeUtils() {
     }
 
+    @SuppressWarnings("unused")
     public static ClassNode forClass(Class<?> cls, int flags) {
         try (InputStream in = JarHelper.getClassBytesStream(cls)) {
             ClassNode ret = new ClassNode();
@@ -42,6 +43,7 @@ public final class NodeUtils {
         }
     }
 
+    @SuppressWarnings("unused")
     public static List<AnnotationNode> annots(String clazz, String method, ClassMetadataReader r) {
         if (clazz.startsWith("L")) clazz = Type.getType(clazz).getInternalName();
         try {
@@ -72,6 +74,7 @@ public final class NodeUtils {
         return result;
     }
 
+    @SuppressWarnings("unused")
     public static int opcodeEmulation(AbstractInsnNode e) {
         int stackSize = 0;
         switch (e.getOpcode()) {
@@ -150,8 +153,6 @@ public final class NodeUtils {
             case INVOKEVIRTUAL:
             case INVOKESPECIAL:
             case INVOKEINTERFACE:
-                stackSize += doMethodEmulation(((MethodInsnNode) e).desc);
-                break;
             case INVOKESTATIC:
                 stackSize += doMethodEmulation(((MethodInsnNode) e).desc);
                 break;

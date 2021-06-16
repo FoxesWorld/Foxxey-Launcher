@@ -131,7 +131,7 @@ public class SaveProfilesCommand extends Command {
         return Arrays.stream(options).anyMatch(e -> e == option);
     }
 
-    public static String getMainClassByVersion(ClientProfile.Version version, MakeProfileOption... options) {
+    public static String getMainClassByVersion(@SuppressWarnings("unused") ClientProfile.Version version, MakeProfileOption... options) {
         if (optionContains(options, MakeProfileOption.LAUNCHWRAPPER)) {
             return "net.minecraft.launchwrapper.Launch";
         }

@@ -68,10 +68,12 @@ public class AttachJarsTask implements LauncherBuildTask {
         return true;
     }
 
+    @SuppressWarnings("unused")
     public List<Path> getJars() {
         return jars;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getExclusions() {
         return exclusions;
     }

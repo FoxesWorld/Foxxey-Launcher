@@ -2,6 +2,7 @@ package pro.gravit.launchserver.binary;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launcher.serialize.stream.StreamObject;
@@ -55,6 +56,7 @@ public class BuildContext {
         clientModules = new HashSet<>();
     }
 
+    @SuppressWarnings("unused")
     public void pushFile(String filename, InputStream inputStream) throws IOException {
         ZipEntry zip = IOHelper.newZipEntry(filename);
         output.putNextEntry(zip);
@@ -71,6 +73,7 @@ public class BuildContext {
         fileList.add(filename);
     }
 
+    @SuppressWarnings("unused")
     public void pushFile(String filename, Object object, Type type) throws IOException {
         String bytes = Launcher.gsonManager.gson.toJson(object, type);
         pushBytes(filename, bytes.getBytes(UNICODE_CHARSET));
@@ -200,6 +203,7 @@ public class BuildContext {
         private final String targetDir;
         private final SecretKeySpec sKeySpec;
         private final IvParameterSpec iKeySpec;
+        @SuppressWarnings("unused")
         private final transient Logger logger = LogManager.getLogger();
 
         private EncryptedRuntimeDirVisitor(ZipOutputStream output, String aesKey, Map<String, byte[]> hashs, Path sourceDir, String targetDir) {
@@ -232,7 +236,7 @@ public class BuildContext {
             }
 
 
-            Cipher cipher = null;
+            Cipher cipher;
             try {
                 cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 cipher.init(Cipher.ENCRYPT_MODE, sKeySpec, iKeySpec);
@@ -264,12 +268,12 @@ public class BuildContext {
             }
 
             @Override
-            public void write(byte[] b) throws IOException {
+            public void write(@NotNull byte[] b) throws IOException {
                 stream.write(b);
             }
 
             @Override
-            public void write(byte[] b, int off, int len) throws IOException {
+            public void write(@NotNull byte[] b, int off, int len) throws IOException {
                 stream.write(b, off, len);
             }
 

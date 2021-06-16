@@ -15,6 +15,7 @@ public interface User {
 
     ClientPermissions getPermissions();
 
+    @SuppressWarnings("unused")
     default boolean isBanned() {
         return false;
     }

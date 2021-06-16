@@ -20,7 +20,7 @@ public class UpdatesManager {
     private final LaunchServer server;
     private final Logger logger = LogManager.getLogger();
     private volatile Map<String, HashedDir> updatesDirMap;
-    private Path cacheFile;
+    private final Path cacheFile;
 
     public UpdatesManager(LaunchServer server) {
         this.server = server;
@@ -119,6 +119,7 @@ public class UpdatesManager {
         return updatesDirMap.get(name);
     }
 
+    @SuppressWarnings("unused")
     public void addUpdate(String name, HashedDir dir) {
         updatesDirMap.put(name, dir);
     }

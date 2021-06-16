@@ -42,6 +42,7 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 
 public class LaunchServerStarter {
+    @SuppressWarnings("unused")
     public static final boolean allowUnsigned = Boolean.getBoolean("launchserver.allowUnsigned");
     public static final boolean prepareMode = Boolean.getBoolean("launchserver.prepareMode");
     private static final Logger logger = LogManager.getLogger();
@@ -49,7 +50,6 @@ public class LaunchServerStarter {
     public static void main(String[] args) throws Exception {
         JVMHelper.checkStackTrace(LaunchServerStarter.class);
         JVMHelper.verifySystemProperties(LaunchServer.class, true);
-        //LogHelper.addOutput(IOHelper.WORKING_DIR.resolve("LaunchServer.log"));
         LogHelper.printVersion("LaunchServer");
         LogHelper.printLicense("LaunchServer");
         if (!StarterAgent.isAgentStarted()) {
@@ -75,7 +75,8 @@ public class LaunchServerStarter {
             LauncherTrustManager.CheckClassResult result = certificateManager.checkClass(LaunchServer.class);
             if (result.type == LauncherTrustManager.CheckClassResultType.SUCCESS) {
                 logger.info("LaunchServer signed by {}", result.endCertificate.getSubjectDN().getName());
-            } else if (result.type == LauncherTrustManager.CheckClassResultType.NOT_SIGNED) {
+            } else //noinspection StatementWithEmptyBody
+                if (result.type == LauncherTrustManager.CheckClassResultType.NOT_SIGNED) {
                 // None
             } else {
                 if (result.exception != null) {
@@ -196,7 +197,6 @@ public class LaunchServerStarter {
         Launcher.gsonManager.initGson();
     }
 
-    @SuppressWarnings("deprecation")
     public static void registerAll() {
         AuthCoreProvider.registerProviders();
         PasswordVerifier.registerProviders();

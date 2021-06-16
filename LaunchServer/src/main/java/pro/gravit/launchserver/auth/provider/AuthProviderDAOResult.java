@@ -3,14 +3,15 @@ package pro.gravit.launchserver.auth.provider;
 import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launchserver.dao.User;
 
-@Deprecated
 public class AuthProviderDAOResult extends AuthProviderResult {
     public User daoObject;
 
+    @SuppressWarnings("unused")
     public AuthProviderDAOResult(String username, String accessToken) {
         super(username, accessToken);
     }
 
+    @SuppressWarnings("unused")
     public AuthProviderDAOResult(String username, String accessToken, ClientPermissions permissions) {
         super(username, accessToken, permissions);
     }

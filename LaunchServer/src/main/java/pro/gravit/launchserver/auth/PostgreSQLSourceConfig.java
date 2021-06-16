@@ -19,12 +19,18 @@ public final class PostgreSQLSourceConfig implements AutoCloseable {
             VerifyHelper.POSITIVE, "launcher.postgresql.maxPoolSize can't be <= 0");
     private transient final Logger logger = LogManager.getLogger();
     // Instance
+    @SuppressWarnings("unused")
     private String poolName;
     // Config
+    @SuppressWarnings("unused")
     private String[] addresses;
+    @SuppressWarnings("unused")
     private int[] ports;
+    @SuppressWarnings("unused")
     private String username;
+    @SuppressWarnings("unused")
     private String password;
+    @SuppressWarnings("unused")
     private String database;
 
     // Cache

@@ -36,7 +36,7 @@ public final class NullAuthHandler extends AuthHandler {
         return getHandler().joinServer(username, accessToken, serverID);
     }
 
-
+    @SuppressWarnings("unused")
     public void setBackend(AuthHandler handler) {
         this.handler = handler;
     }

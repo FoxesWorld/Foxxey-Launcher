@@ -16,10 +16,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Deprecated from 5.2.0
- */
-@Deprecated
+@SuppressWarnings("unused")
 public abstract class HibernateDaoProvider extends DaoProvider implements Reconfigurable, AutoCloseable {
     public String driver;
     public String url;

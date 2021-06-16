@@ -33,18 +33,22 @@ public class MirrorManager {
         list.add(m);
     }
 
+    @SuppressWarnings("unused")
     public Mirror getDefaultMirror() {
         return defaultMirror;
     }
 
+    @SuppressWarnings("unused")
     public void setDefaultMirror(Mirror m) {
         defaultMirror = m;
     }
 
+    @SuppressWarnings("unused")
     public void disableMirror(int index) {
         list.get(index).enabled = false;
     }
 
+    @SuppressWarnings("unused")
     public void enableMirror(int index) {
         list.get(index).enabled = true;
     }

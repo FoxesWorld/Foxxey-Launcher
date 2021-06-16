@@ -19,6 +19,7 @@ public final class RejectAuthProvider extends AuthProvider implements Reconfigur
     public String message;
     public ArrayList<String> whitelist = new ArrayList<>();
 
+    @SuppressWarnings("unused")
     public RejectAuthProvider() {
     }
 
