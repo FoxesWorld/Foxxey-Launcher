@@ -26,6 +26,7 @@ public class Client {
     public String username;
     public UUID uuid;
     public TrustLevel trustLevel;
+    public int groupId;
 
     public transient AuthProviderPair auth;
 
@@ -50,6 +51,7 @@ public class Client {
         permissions = ClientPermissions.DEFAULT;
         username = "";
         checkSign = false;
+        groupId = 4;
     }
 
     //Данные авторизации

@@ -527,6 +527,10 @@ public final class ClientProfile implements Comparable<ClientProfile> {
     this.runtimeInClientConfig = runtimeInClientConfig;
   }
 
+  public int getClientGroup() {
+    return clientGroup;
+  }
+
   public enum Version {
     MC125("1.2.5", 29),
     MC147("1.4.7", 51),

@@ -1,0 +1,66 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id 'idea'
+    id 'eclipse'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+group 'pro.gravit.launcher'
+version '2.0.0'
+def mainClassName = "pro.gravit.launcher.client.JavaRuntimeModule"
+
+configurations {
+    bundle
+    pack
+    api.extendsFrom bundle, pack
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    options.incremental = true // one flag, and things will get MUCH faster
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName,
+            "Module-Config-Class": "pro.gravit.launcher.client.gui.config.GuiModuleConfig",
+            "Module-Config-Name": "JavaRuntime")
+}
+
+task runDev(type: JavaExec) {
+    dependsOn assemble
+    group = "Execution"
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = ["-Dlauncherdebug.modules="+mainClassName, "-Dlauncherdebug.env=DEBUG"]
+    main = "pro.gravit.launcher.debug.DebugMain"
+}
+
+repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    pack project(':Launcher')
+    implementation "io.netty:netty-codec-http:4.1.48.Final"
+    implementation 'com.github.oshi:oshi-core:4.5.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
+}
+
+defaultTasks 'build'

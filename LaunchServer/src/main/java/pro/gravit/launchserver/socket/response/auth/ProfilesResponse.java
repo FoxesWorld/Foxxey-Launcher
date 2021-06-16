@@ -10,6 +10,7 @@ import pro.gravit.launchserver.socket.response.SimpleResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ProfilesResponse extends SimpleResponse {
     @Override
@@ -35,7 +36,10 @@ public class ProfilesResponse extends SimpleResponse {
                 }
             }
         } else {
-            profileList = List.copyOf(serverProfiles);
+            profileList = serverProfiles
+                    .stream()
+                    .filter(clientProfile -> clientProfile.getClientGroup() == client.groupId)
+                    .collect(Collectors.toList());
         }
         sendResult(new ProfilesRequestEvent(profileList));
     }
