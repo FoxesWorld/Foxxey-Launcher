@@ -8,6 +8,7 @@ import pro.gravit.launcher.request.auth.password.Auth2FAPassword;
 import pro.gravit.launcher.request.auth.password.AuthAESPassword;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launcher.request.auth.password.AuthTOTPPassword;
+import pro.gravit.launcher.utils.HWIDProvider;
 import pro.gravit.utils.helper.SecurityHelper;
 
 public class AuthService {
@@ -35,7 +36,8 @@ public class AuthService {
         return auth2FAPassword;
     }
     public AuthRequest makeAuthRequest(String login, AuthRequest.AuthPasswordInterface password, String authId) {
-        return new AuthRequest(login, password, authId, true, application.isDebugMode() ? AuthRequest.ConnectTypes.API : AuthRequest.ConnectTypes.CLIENT);
+        HWIDProvider hwidProvider = new HWIDProvider();
+        return new AuthRequest(login, password, authId, true, application.isDebugMode() ? AuthRequest.ConnectTypes.API : AuthRequest.ConnectTypes.CLIENT, hwidProvider.getHardwareId());
     }
     private byte[] encryptAESPassword(String password) throws Exception {
         return SecurityHelper.encrypt(Launcher.getConfig().passwordEncryptKey, password);

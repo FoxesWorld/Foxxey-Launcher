@@ -21,33 +21,8 @@ public final class AuthRequest extends Request<AuthRequestEvent> implements WebS
     private final boolean getSession;
     @LauncherNetworkAPI
     private final ConnectTypes authType;
-
-    @Deprecated
-    public AuthRequest(String login, byte[] password) {
-        this.login = VerifyHelper.verify(login, VerifyHelper.NOT_EMPTY, "Login can't be empty");
-        this.password = new AuthECPassword(password.clone());
-        auth_id = "";
-        getSession = true;
-        authType = ConnectTypes.CLIENT;
-    }
-
-    @Deprecated
-    public AuthRequest(String login, byte[] password, String auth_id) {
-        this.login = VerifyHelper.verify(login, VerifyHelper.NOT_EMPTY, "Login can't be empty");
-        this.password = new AuthECPassword(password.clone());
-        this.auth_id = auth_id;
-        getSession = true;
-        authType = ConnectTypes.CLIENT;
-    }
-
-    @Deprecated
-    public AuthRequest(String login, byte[] encryptedPassword, String auth_id, ConnectTypes authType) {
-        this.login = login;
-        this.password = new AuthECPassword(encryptedPassword.clone());
-        this.auth_id = auth_id;
-        this.authType = authType;
-        this.getSession = false;
-    }
+    @LauncherNetworkAPI
+    private final String hardwareId;
 
     public AuthRequest(String login, String password, String auth_id, ConnectTypes authType) {
         this.login = login;
@@ -55,14 +30,16 @@ public final class AuthRequest extends Request<AuthRequestEvent> implements WebS
         this.auth_id = auth_id;
         this.authType = authType;
         this.getSession = false;
+        this.hardwareId = null;
     }
 
-    public AuthRequest(String login, AuthPasswordInterface password, String auth_id, boolean getSession, ConnectTypes authType) {
+    public AuthRequest(String login, AuthPasswordInterface password, String auth_id, boolean getSession, ConnectTypes authType, String hardwareId) {
         this.login = login;
         this.password = password;
         this.auth_id = auth_id;
         this.getSession = getSession;
         this.authType = authType;
+        this.hardwareId = hardwareId;
     }
 
     @SuppressWarnings("deprecation")
