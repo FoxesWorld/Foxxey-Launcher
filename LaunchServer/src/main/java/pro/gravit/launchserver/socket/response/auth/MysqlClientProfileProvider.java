@@ -90,7 +90,7 @@ public class MysqlClientProfileProvider extends ClientProfileProvider {
   }
 
   public void init(LaunchServer launchServer) {
-    sqlGetAll = String.format("SELECT * FROM %s WHERE %s = true", tableServers, true);
+    sqlGetAll = String.format("SELECT * FROM %s WHERE %s = true", tableServers, columnEnabled);
   }
 
   public void close() {
