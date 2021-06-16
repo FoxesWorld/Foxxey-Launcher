@@ -28,7 +28,7 @@ public final class ClientProfile implements Comparable<ClientProfile> {
 
   private String title;
 
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
 
   private String version;
 

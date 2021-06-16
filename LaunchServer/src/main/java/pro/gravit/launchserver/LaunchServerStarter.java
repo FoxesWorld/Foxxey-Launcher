@@ -25,6 +25,7 @@ import pro.gravit.launchserver.manangers.CertificateManager;
 import pro.gravit.launchserver.manangers.LaunchServerGsonManager;
 import pro.gravit.launchserver.modules.impl.LaunchServerModulesManager;
 import pro.gravit.launchserver.socket.WebSocketService;
+import pro.gravit.launchserver.socket.response.auth.ClientProfileProvider;
 import pro.gravit.utils.command.CommandHandler;
 import pro.gravit.utils.command.JLineCommandHandler;
 import pro.gravit.utils.command.StdCommandHandler;
@@ -205,6 +206,7 @@ public class LaunchServerStarter {
         TextureProvider.registerProviders();
         Component.registerComponents();
         ProtectHandler.registerHandlers();
+        ClientProfileProvider.registerProviders();
         WebSocketService.registerResponses();
         DaoProvider.registerProviders();
         AuthRequest.registerProviders();
@@ -220,7 +222,6 @@ public class LaunchServerStarter {
 
         // Create new config
         logger.info("Creating LaunchServer config");
-
 
         LaunchServerConfig newConfig = LaunchServerConfig.getDefault(env);
         // Set server address

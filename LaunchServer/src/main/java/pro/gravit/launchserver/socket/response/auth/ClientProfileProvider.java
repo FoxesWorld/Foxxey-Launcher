@@ -1,22 +1,27 @@
 package pro.gravit.launchserver.socket.response.auth;
 
-import pro.gravit.launcher.profiles.ClientProfile;
-import pro.gravit.utils.ProviderMap;
-
 import java.util.List;
+import pro.gravit.launcher.profiles.ClientProfile;
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.auth.MySQLSourceConfig;
+import pro.gravit.utils.ProviderMap;
 
 public abstract class ClientProfileProvider {
 
-    public static final ProviderMap<ClientProfileProvider> providers = new ProviderMap<>(
-            "ClientProfileProvider");
+  public static final ProviderMap<ClientProfileProvider> providers = new ProviderMap<>(
+      "ClientProfileProvider");
+  private static boolean registerProviders;
 
-    public static void registerProviders() {
-        providers.register("mysql", MysqlClientProfileProvider.class);
+  public static void registerProviders() {
+    if (!registerProviders) {
+      providers.register("mysql", MysqlClientProfileProvider.class);
+      registerProviders = true;
     }
+  }
 
-    public abstract List<ClientProfile> getAll();
+  public abstract List<ClientProfile> getAll();
 
-    public abstract void init();
+  public abstract void init(LaunchServer launchServer);
 
-    public abstract void close();
+  public abstract void close();
 }

@@ -8,6 +8,7 @@ import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.LauncherConfig;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
+import pro.gravit.launchserver.auth.MySQLSourceConfig;
 import pro.gravit.launchserver.auth.handler.MemoryAuthHandler;
 import pro.gravit.launchserver.auth.protect.ProtectHandler;
 import pro.gravit.launchserver.auth.protect.StdProtectHandler;
@@ -22,6 +23,7 @@ import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.components.RegLimiterComponent;
 import pro.gravit.launchserver.dao.provider.DaoProvider;
 import pro.gravit.launchserver.socket.response.auth.ClientProfileProvider;
+import pro.gravit.launchserver.socket.response.auth.MysqlClientProfileProvider;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
 
@@ -78,6 +80,7 @@ public final class LaunchServerConfig {
         a.displayName = "Default";
         newConfig.auth.put("std", a);
         newConfig.protectHandler = new StdProtectHandler();
+        newConfig.clientProfileProvider = MysqlClientProfileProvider.createDefault();
         newConfig.sessions = new MemorySessionStorage();
         newConfig.binaryName = "Launcher";
 
@@ -205,8 +208,8 @@ public final class LaunchServerConfig {
             protectHandler.checkLaunchServerLicense();
         }
         if (clientProfileProvider != null) {
-            clientProfileProvider.init();
             server.registerObject("clientProfileProvider", clientProfileProvider);
+            clientProfileProvider.init(server);
         }
         if (sessions != null) {
             sessions.init(server);

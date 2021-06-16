@@ -387,8 +387,8 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
     }
 
     public void syncProfilesDir() throws IOException {
+        logger.info("Syncing profiles");
         profilesList = Set.copyOf(config.clientProfileProvider.getAll());
-
         if (pingServerManager != null)
             pingServerManager.syncServers();
     }
