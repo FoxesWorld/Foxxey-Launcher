@@ -12,7 +12,6 @@ import pro.gravit.launcher.client.gui.utils.FXMLFactory;
 import pro.gravit.launcher.request.RequestException;
 import pro.gravit.utils.helper.LogHelper;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
@@ -21,13 +20,13 @@ public abstract class AbstractVisualComponent {
     protected final ContextHelper contextHelper;
     protected AbstractStage currentStage;
     protected Pane layout;
-    private final CompletableFuture<Node> future;
+    private final String sysFxmlPath;
     boolean isInit;
     protected boolean isResetOnShow = false;
 
     protected AbstractVisualComponent(String fxmlPath, JavaFXApplication application) {
         this.application = application;
-        this.future = application.fxmlFactory.getAsync(fxmlPath);
+        this.sysFxmlPath = fxmlPath;
         this.contextHelper = new ContextHelper(this);
     }
 
@@ -49,9 +48,11 @@ public abstract class AbstractVisualComponent {
         return isInit;
     }
 
+    public abstract String getName();
+
     protected Parent getFxmlRoot() {
         try {
-            return  (Parent) future.get();
+            return  (Parent) application.fxmlFactory.getAsync(sysFxmlPath).get();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {

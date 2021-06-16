@@ -37,6 +37,10 @@ public abstract class AbstractStage {
         });
     }
 
+    public boolean isShowing() {
+        return stage.isShowing();
+    }
+
     public AbstractVisualComponent getVisualComponent() {
         return scene;
     }

@@ -30,6 +30,11 @@ public class ProcessingOverlay extends AbstractOverlay {
     }
 
     @Override
+    public String getName() {
+        return "processing";
+    }
+
+    @Override
     public void reset() {
         description.textProperty().unbind();
         description.getStyleClass().remove("error");

@@ -71,7 +71,7 @@
                  <Insets bottom="5.0" top="5.0" />
              </padding>
              <content>
-                 <VBox alignment="BOTTOM_RIGHT" />
+                 <VBox alignment="BOTTOM_LEFT" />
              </content>
          <cursor>
             <Cursor fx:constant="HAND" />
