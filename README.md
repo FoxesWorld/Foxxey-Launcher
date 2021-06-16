@@ -3,6 +3,7 @@ __FoxesWorld__ launcher
   **TODO**
   - __SystemdNotifer__
   - Rewrite server profiles
+  - Сommand `clientList` - to show the list of loaded clients
   - Rewrite filesLoad
   - Add optional files to every client
   - Add optional server settings
@@ -12,6 +13,5 @@ __FoxesWorld__ launcher
 
   **WAS DONE**
   - ServerLauncher reload
-  - Сommand `clientList` - to show the list of loaded clients
   - Authorisation
   - Skins and Cloaks parser
