@@ -25,6 +25,12 @@ public abstract class AuthSocialProvider implements AutoCloseable {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T isSupport(Class<T> clazz) {
+        if (clazz.isAssignableFrom(getClass())) return (T) this;
+        return null;
+    }
+
     public abstract void init(LaunchServer server, AuthCoreProvider provider);
 
     public abstract List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client);

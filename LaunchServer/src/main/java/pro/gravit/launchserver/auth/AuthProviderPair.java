@@ -24,6 +24,22 @@ public final class AuthProviderPair {
     public transient Set<String> features;
     public String displayName;
 
+    public AuthProviderPair(AuthCoreProvider core, TextureProvider textureProvider) {
+        this.core = core;
+        this.textureProvider = textureProvider;
+    }
+
+    public AuthProviderPair(AuthCoreProvider core, AuthSocialProvider social) {
+        this.core = core;
+        this.social = social;
+    }
+
+    public AuthProviderPair(AuthCoreProvider core, AuthSocialProvider social, TextureProvider textureProvider) {
+        this.core = core;
+        this.social = social;
+        this.textureProvider = textureProvider;
+    }
+
     public AuthProviderPair(AuthProvider provider, AuthHandler handler, TextureProvider textureProvider) {
         this.provider = provider;
         this.handler = handler;
@@ -57,7 +73,10 @@ public final class AuthProviderPair {
     @SuppressWarnings("unused")
     public final <T> T isSupport(Class<T> clazz) {
         if (core == null) return null;
-        return core.isSupport(clazz);
+        T result = null;
+        if (social != null) result = social.isSupport(clazz);
+        if (result == null) result = core.isSupport(clazz);
+        return result;
     }
 
     public final void init(LaunchServer srv, String name) {
