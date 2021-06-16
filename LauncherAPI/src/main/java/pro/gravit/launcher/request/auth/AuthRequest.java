@@ -24,6 +24,36 @@ public final class AuthRequest extends Request<AuthRequestEvent> implements WebS
     @LauncherNetworkAPI
     private final String hardwareId;
 
+    @Deprecated
+    public AuthRequest(String login, byte[] password) {
+        this.login = VerifyHelper.verify(login, VerifyHelper.NOT_EMPTY, "Login can't be empty");
+        this.password = new AuthECPassword(password.clone());
+        auth_id = "";
+        getSession = true;
+        authType = ConnectTypes.CLIENT;
+        hardwareId = null;
+    }
+
+    @Deprecated
+    public AuthRequest(String login, byte[] password, String auth_id) {
+        this.login = VerifyHelper.verify(login, VerifyHelper.NOT_EMPTY, "Login can't be empty");
+        this.password = new AuthECPassword(password.clone());
+        this.auth_id = auth_id;
+        getSession = true;
+        authType = ConnectTypes.CLIENT;
+        hardwareId = null;
+    }
+
+    @Deprecated
+    public AuthRequest(String login, byte[] encryptedPassword, String auth_id, ConnectTypes authType) {
+        this.login = login;
+        this.password = new AuthECPassword(encryptedPassword.clone());
+        this.auth_id = auth_id;
+        this.authType = authType;
+        this.getSession = false;
+        hardwareId = null;
+    }
+
     public AuthRequest(String login, String password, String auth_id, ConnectTypes authType) {
         this.login = login;
         this.password = new AuthPlainPassword(password);
