@@ -3,24 +3,24 @@
 
 /*-- Подключение шрифтов --*/
 @font-face {
-    font-family: 'Open Sans';
-    src: url('./OpenSans-Regular.ttf');
+    font-family: 'FSElliotPro';
+    src: url('./FSElliotPro.ttf');
 }
 @font-face {
-    font-family: 'Open Sans Bold';
-    src: url('./OpenSans-Bold.ttf');
+    font-family: 'FSElliotPro Bold';
+    src: url('./FSElliotPro-Bold.ttf');
 }
 @font-face {
     font-family: 'Open Sans Italic';
     src: url('./OpenSans-Italic.ttf');
 }
 @font-face {
-    font-family: 'Open Sans Light';
-    src: url('./OpenSans-Light.ttf');
+    font-family: 'FSElliotPro Light';
+    src: url('./FSElliotPro-Light.ttf');
 }
 @font-face {
-    font-family: 'Open Sans BoldItalic';
-    src: url('./OpenSans-BoldItalic.ttf');
+    font-family: 'FSElliotPro Heavy';
+    src: url('./FSElliotPro-Heavy.ttf');
 }
 
 Button,
@@ -32,7 +32,7 @@ RadioButton {
 
 /*-- Шрифты --*/
 .root {
-    -fx-font-family: "Open Sans";
+    -fx-font-family: "FSElliotPro";
 }
 
 /*-- Вид блоков --*/
