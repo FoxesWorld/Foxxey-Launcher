@@ -1,4 +1,5 @@
 project.ext {
+    vkSdk = '1.0.9'
     verAsm = '9.1'
     verNetty = '4.1.60.Final'
     verOshiCore = '5.6.0'

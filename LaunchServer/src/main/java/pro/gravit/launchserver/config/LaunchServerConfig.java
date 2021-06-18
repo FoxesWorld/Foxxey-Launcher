@@ -20,8 +20,10 @@ import pro.gravit.launchserver.components.Component;
 import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.components.RegLimiterComponent;
 import pro.gravit.launchserver.dao.provider.DaoProvider;
-import pro.gravit.launchserver.socket.response.auth.ClientProfileProvider;
-import pro.gravit.launchserver.socket.response.auth.MysqlClientProfileProvider;
+import pro.gravit.launchserver.client.ClientProfileProvider;
+import pro.gravit.launchserver.client.MysqlClientProfileProvider;
+import pro.gravit.launchserver.news.EmptyNewsProvider;
+import pro.gravit.launchserver.news.NewsProvider;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
 
@@ -49,6 +51,7 @@ public final class LaunchServerConfig {
     public LauncherConf launcher;
     public JarSignerConf sign;
     public String startScript;
+    public NewsProvider newsProvider;
     public ClientProfileProvider clientProfileProvider;
     private transient LaunchServer server = null;
     private transient AuthProviderPair authDefault;
@@ -78,6 +81,7 @@ public final class LaunchServerConfig {
         newConfig.auth.put("std", a);
         newConfig.protectHandler = new StdProtectHandler();
         newConfig.clientProfileProvider = MysqlClientProfileProvider.createDefault();
+        newConfig.newsProvider = new EmptyNewsProvider();
         newConfig.sessions = new MemorySessionStorage();
         newConfig.binaryName = "Launcher";
 
@@ -170,20 +174,19 @@ public final class LaunchServerConfig {
                 break;
             }
         }
-        if (clientProfileProvider == null) {
-            throw new NullPointerException("ClientProfileProvider must not be null");
-        }
-        if (protectHandler == null) {
-            throw new NullPointerException("ProtectHandler must not be null");
-        }
+        verifyNonNull(clientProfileProvider, "ClientProfileProvider");
+        verifyNonNull(newsProvider, "NewsProvider");
+        verifyNonNull(protectHandler, "ProtectHandler");
         if (!isOneDefault) {
             throw new IllegalStateException("No auth pairs declared by default.");
         }
-        if (env == null) {
-            throw new NullPointerException("Env must not be null");
-        }
-        if (netty == null) {
-            throw new NullPointerException("Netty must not be null");
+        verifyNonNull(env, "Env");
+        verifyNonNull(netty, "Netty");
+    }
+
+    private void verifyNonNull(Object object, String objectName) {
+        if (object == null) {
+            throw new NullPointerException(objectName + " must not be null");
         }
     }
 
@@ -207,6 +210,10 @@ public final class LaunchServerConfig {
         if (clientProfileProvider != null) {
             server.registerObject("clientProfileProvider", clientProfileProvider);
             clientProfileProvider.init(server);
+        }
+        if (newsProvider != null) {
+            server.registerObject("newsProvider", newsProvider);
+            newsProvider.init(server);
         }
         if (sessions != null) {
             sessions.init(server);
@@ -261,6 +268,10 @@ public final class LaunchServerConfig {
         if (clientProfileProvider != null) {
             server.unregisterObject("clientProfileProvider", clientProfileProvider);
             clientProfileProvider.close();
+        }
+        if (newsProvider != null) {
+            server.unregisterObject("newsProvider", newsProvider);
+            newsProvider.close();
         }
         if (sessions != null) {
             server.unregisterObject("sessions", sessions);

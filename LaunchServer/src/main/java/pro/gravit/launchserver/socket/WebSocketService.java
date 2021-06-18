@@ -14,6 +14,7 @@ import pro.gravit.launcher.events.ExceptionEvent;
 import pro.gravit.launcher.events.RequestEvent;
 import pro.gravit.launcher.events.request.ErrorRequestEvent;
 import pro.gravit.launcher.events.request.ExitRequestEvent;
+import pro.gravit.launcher.events.request.GetNewsEvent;
 import pro.gravit.launcher.request.WebSocketEvent;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.dao.User;
@@ -25,6 +26,7 @@ import pro.gravit.launchserver.socket.response.management.FeaturesResponse;
 import pro.gravit.launchserver.socket.response.management.PingServerReportResponse;
 import pro.gravit.launchserver.socket.response.management.PingServerResponse;
 import pro.gravit.launchserver.socket.response.management.ServerStatusResponse;
+import pro.gravit.launchserver.socket.response.news.GetNewsResponse;
 import pro.gravit.launchserver.socket.response.profile.BatchProfileByUsername;
 import pro.gravit.launchserver.socket.response.profile.ProfileByUUIDResponse;
 import pro.gravit.launchserver.socket.response.profile.ProfileByUsername;
@@ -68,6 +70,7 @@ public class WebSocketService {
     }
 
     public static void registerResponses() {
+        providers.register("news", GetNewsResponse.class);
         providers.register("auth", AuthResponse.class);
         providers.register("checkServer", CheckServerResponse.class);
         providers.register("joinServer", JoinServerResponse.class);
