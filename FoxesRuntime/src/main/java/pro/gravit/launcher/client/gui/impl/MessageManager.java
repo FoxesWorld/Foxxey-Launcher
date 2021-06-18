@@ -1,17 +1,7 @@
 package pro.gravit.launcher.client.gui.impl;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Text;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+
 import pro.gravit.launcher.client.gui.dialogs.*;
 import pro.gravit.launcher.client.gui.helper.PositionHelper;
 import pro.gravit.launcher.client.gui.scenes.AbstractScene;
@@ -20,10 +10,8 @@ import pro.gravit.launcher.client.gui.JavaFXApplication;
 import pro.gravit.launcher.client.gui.helper.LookupHelper;
 import pro.gravit.utils.helper.LogHelper;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class MessageManager {
@@ -75,29 +63,19 @@ public class MessageManager {
 
     public void createNotification(String head, String message, boolean isLauncher) {
         NotificationDialog dialog = new NotificationDialog(application, head, message);
-        if(isLauncher) {
-            AbstractScene scene = application.getCurrentScene();
-            if(scene == null) {
-                throw new NullPointerException("Try show launcher notification in application.getCurrentScene() == null");
-            }
-            ContextHelper.runInFxThreadStatic(() -> {
-                initDialogInScene(scene, dialog);
+        AtomicReference<DialogStage> stage = new AtomicReference<>(null);
+        ContextHelper.runInFxThreadStatic(() -> {
+            NotificationDialog.NotificationSlot slot = new NotificationDialog.NotificationSlot((scrollTo) ->
+                    stage.get().stage.setY(stage.get().stage.getY()+scrollTo),
+                    ((Pane)dialog.getFxmlRoot()).getPrefHeight()+20);
+            dialog.setPosition(PositionHelper.PositionInfo.BOTTOM_RIGHT, slot);
+            dialog.setOnClose(() -> {
+                stage.get().close();
+                stage.get().stage.setScene(null);
             });
-        } else {
-            AtomicReference<DialogStage> stage = new AtomicReference<>(null);
-            ContextHelper.runInFxThreadStatic(() -> {
-                NotificationDialog.NotificationSlot slot = new NotificationDialog.NotificationSlot((scrollTo) -> {
-                    stage.get().stage.setY(stage.get().stage.getY()+scrollTo);
-                }, ((Pane)dialog.getFxmlRoot()).getPrefHeight()+20);
-                dialog.setPosition(PositionHelper.PositionInfo.BOTTOM_RIGHT, slot);
-                dialog.setOnClose(() -> {
-                    stage.get().close();
-                    stage.get().stage.setScene(null);
-                });
-                stage.set(new DialogStage(application, head, dialog));
-                stage.get().show();
-            });
-        }
+            stage.set(new DialogStage(application, head, dialog));
+            stage.get().show();
+        });
     }
 
     public void showDialog(String header, String text, Runnable onApplyCallback, Runnable onCloseCallback, boolean isLauncher) {
@@ -120,24 +98,14 @@ public class MessageManager {
     }
 
     public void showAbstractDialog(AbstractDialog dialog, String header, boolean isLauncher) {
-        if(isLauncher) {
-            AbstractScene scene = application.getCurrentScene();
-            if(scene == null) {
-                throw new NullPointerException("Try show launcher dialog in application.getCurrentScene() == null");
-            }
-            ContextHelper.runInFxThreadStatic(() -> {
-                initDialogInScene(scene, dialog);
-            });
-        } else {
-            AtomicReference<DialogStage> stage = new AtomicReference<>(null);
-            ContextHelper.runInFxThreadStatic(() -> {
-                stage.set(new DialogStage(application, header, dialog));
-                stage.get().show();
-            });
-            dialog.setOnClose(() -> {
-                stage.get().close();
-                stage.get().stage.setScene(null);
-            });
-        }
+        AtomicReference<DialogStage> stage = new AtomicReference<>(null);
+        ContextHelper.runInFxThreadStatic(() -> {
+            stage.set(new DialogStage(application, header, dialog));
+            stage.get().show();
+        });
+        dialog.setOnClose(() -> {
+            stage.get().close();
+            stage.get().stage.setScene(null);
+        });
     }
 }

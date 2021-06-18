@@ -11,6 +11,7 @@ import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportExit;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.handlers.WebSocketFrameHandler;
 import pro.gravit.launchserver.socket.response.SimpleResponse;
+import pro.gravit.utils.helper.LogHelper;
 
 public class ExitResponse extends SimpleResponse {
     public boolean exitAll;

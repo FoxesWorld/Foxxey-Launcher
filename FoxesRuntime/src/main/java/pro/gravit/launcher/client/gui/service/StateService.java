@@ -105,10 +105,12 @@ public class StateService {
         return rawAuthResult.groupId;
     }
 
-    public int getGetBalance() {
+    public String getGetBalance() {
         if (rawAuthResult == null)
-            return 0;
-        return rawAuthResult.balance;
+            return "0 ЮНИТОВ";
+        if (rawAuthResult.balance == 2 || rawAuthResult.balance == 3 || rawAuthResult.balance == 4)
+            return rawAuthResult.balance + " ЮНИТА";
+        return rawAuthResult.balance + " ЮНИТОВ";
     }
 
     public List<ClientProfile> getProfiles() {
