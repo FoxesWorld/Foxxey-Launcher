@@ -76,7 +76,7 @@ public class RestoreResponse extends SimpleResponse {
             User user = session.getUser();
             client.coreObject = user;
             client.sessionObject = session;
-            server.authManager.internalAuth(client, client.type == null ? AuthResponse.ConnectTypes.API : client.type, pair, user.getUsername(), user.getUUID(), user.getPermissions(), true);
+            server.authManager.internalAuth(client, client.type == null ? AuthResponse.ConnectTypes.API : client.type, pair, user.getUsername(), 4, user.getUUID(), 0, user.getPermissions(),  true);
         }
         List<String> invalidTokens = new ArrayList<>(4);
         if (extended != null) {

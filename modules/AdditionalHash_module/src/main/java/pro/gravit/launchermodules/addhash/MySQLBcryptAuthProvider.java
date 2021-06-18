@@ -23,7 +23,7 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
     private String[] queryParams;
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws SQLException, AuthException {
         if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         try (Connection c = mySQLHolder.getConnection()) {
             PreparedStatement s = c.prepareStatement(query);
@@ -34,7 +34,7 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
             // Execute SQL query
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
-                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), new ClientPermissions(set.getLong(3))) : authError(message) : authError(message);
+                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), new ClientPermissions(set.getLong(3)), 0, 4) : authError(message) : authError(message);
             }
         }
     }

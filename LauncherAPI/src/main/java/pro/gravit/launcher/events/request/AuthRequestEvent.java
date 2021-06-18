@@ -27,6 +27,10 @@ public class AuthRequestEvent extends RequestEvent {
     public UUID session;
     @LauncherNetworkAPI
     public OAuthRequestEvent oauth;
+    @LauncherNetworkAPI
+    public int balance;
+    @LauncherNetworkAPI
+    public int groupId;
 
     public AuthRequestEvent() {
     }

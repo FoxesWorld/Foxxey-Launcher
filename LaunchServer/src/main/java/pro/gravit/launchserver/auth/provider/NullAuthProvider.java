@@ -10,8 +10,8 @@ public final class NullAuthProvider extends AuthProvider {
     private volatile AuthProvider provider;
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
-        return getProvider().auth(login, password, ip);
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws Exception {
+        return getProvider().auth(login, password, ip, hwid);
     }
 
     @Override

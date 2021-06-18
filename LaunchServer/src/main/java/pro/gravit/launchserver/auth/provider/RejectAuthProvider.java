@@ -28,11 +28,11 @@ public final class RejectAuthProvider extends AuthProvider implements Reconfigur
     }
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws AuthException {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws AuthException {
         if (whitelist != null) {
             for (String username : whitelist) {
                 if (login.equals(username)) {
-                    return new AuthProviderResult(login, SecurityHelper.randomStringToken(), ClientPermissions.DEFAULT);
+                    return new AuthProviderResult(login, SecurityHelper.randomStringToken(), ClientPermissions.DEFAULT, 0, 4);
                 }
             }
         }

@@ -8,6 +8,7 @@ import pro.gravit.launcher.client.gui.helper.JavaVersionsHelper;
 import pro.gravit.launcher.events.request.GetAvailabilityAuthRequestEvent;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launcher.request.auth.AuthRequest;
+import pro.gravit.utils.helper.JavaHelper;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +46,10 @@ public class RuntimeSettings extends UserSettings {
     public long oauthExpire;
     @LauncherNetworkAPI
     public Map<UUID, ProfileSettings> profileSettings = new HashMap<>();
+    @LauncherNetworkAPI
+    public int balance;
+    @LauncherNetworkAPI
+    public int groupId;
 
     public static RuntimeSettings getDefault() {
         RuntimeSettings runtimeSettings = new RuntimeSettings();
@@ -52,6 +57,8 @@ public class RuntimeSettings extends UserSettings {
         runtimeSettings.updatesDir = DirBridge.defaultUpdatesDir;
         runtimeSettings.locale = DEFAULT_LOCALE;
         runtimeSettings.disableJavaDownload = false;
+        runtimeSettings.balance = 0;
+        runtimeSettings.groupId = 4;
         return runtimeSettings;
     }
 
@@ -88,8 +95,11 @@ public class RuntimeSettings extends UserSettings {
 
         public static ProfileSettings getDefault(ClientProfile profile) {
             ProfileSettings settings = new ProfileSettings();
-            settings.ram = 2048;
-            ClientLauncherWrapper.JavaVersion version = JavaVersionsHelper.getRecommendJavaVersion(profile);
+            ClientProfile.ProfileDefaultSettings defaultSettings = profile.getSettings();
+            settings.ram = defaultSettings.ram;
+            settings.autoEnter = defaultSettings.autoEnter;
+            settings.fullScreen = defaultSettings.fullScreen;
+            JavaHelper.JavaVersion version = JavaVersionsHelper.getRecommendJavaVersion(profile);
             if(version != null) {
                 settings.javaPath = version.jvmDir.toString();
             }

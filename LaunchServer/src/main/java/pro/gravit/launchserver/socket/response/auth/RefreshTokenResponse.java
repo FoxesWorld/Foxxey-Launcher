@@ -37,7 +37,7 @@ public class RefreshTokenResponse extends SimpleResponse {
             sendError("Invalid request");
             return;
         }
-        AuthManager.AuthReport report = pair.core.refreshAccessToken(refreshToken, new AuthResponse.AuthContext(client, null, null, ip, AuthResponse.ConnectTypes.API, pair));
+        AuthManager.AuthReport report = pair.core.refreshAccessToken(refreshToken, new AuthResponse.AuthContext(client, null, null, ip, AuthResponse.ConnectTypes.API, pair, null));
         if (report == null || !report.isUsingOAuth()) {
             sendError("Invalid RefreshToken");
             return;

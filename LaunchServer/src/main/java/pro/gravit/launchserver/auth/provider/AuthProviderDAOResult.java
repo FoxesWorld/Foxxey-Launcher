@@ -13,11 +13,11 @@ public class AuthProviderDAOResult extends AuthProviderResult {
 
     @SuppressWarnings("unused")
     public AuthProviderDAOResult(String username, String accessToken, ClientPermissions permissions) {
-        super(username, accessToken, permissions);
+        super(username, accessToken, permissions, 0, 4);
     }
 
     public AuthProviderDAOResult(String username, String accessToken, ClientPermissions permissions, User daoObject) {
-        super(username, accessToken, permissions);
+        super(username, accessToken, permissions, 0, 4);
         this.daoObject = daoObject;
     }
 }

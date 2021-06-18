@@ -59,7 +59,7 @@ public abstract class AuthProvider implements AutoCloseable {
      * @throws Exception Throws an exception {@link AuthException} {@link pro.gravit.utils.HookException} if the verification script returned a meaningful error
      *                   In other cases, throwing an exception indicates a serious error
      */
-    public abstract AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception;
+    public abstract AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws Exception;
 
     public void preAuth(@SuppressWarnings("unused") String login,
                         @SuppressWarnings("unused") AuthRequest.AuthPasswordInterface password,

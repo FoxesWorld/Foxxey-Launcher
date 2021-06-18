@@ -30,7 +30,7 @@ public final class MySQLAuthProvider extends AuthProvider {
     }
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws SQLException, AuthException {
         if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         try (Connection c = mySQLHolder.getConnection()) {
             PreparedStatement s = c.prepareStatement(query);
@@ -42,7 +42,7 @@ public final class MySQLAuthProvider extends AuthProvider {
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
                 return set.next() ? new AuthProviderResult(set.getString(1), SecurityHelper.randomStringToken(), new ClientPermissions(
-                        set.getLong(2), flagsEnabled ? set.getLong(3) : 0)) : authError(message);
+                        set.getLong(2), flagsEnabled ? set.getLong(3) : 0), 0, 4) : authError(message);
             }
         }
 

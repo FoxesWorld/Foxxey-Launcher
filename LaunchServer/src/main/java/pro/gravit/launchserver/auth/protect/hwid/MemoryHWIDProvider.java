@@ -19,7 +19,7 @@ public class MemoryHWIDProvider extends HWIDProvider implements Reconfigurable {
     private transient final Logger logger = LogManager.getLogger();
     public double warningSpoofingLevel = -1.0;
     public double criticalCompareLevel = 1.0;
-    public transient Set<MemoryHWIDEntity> db = ConcurrentHashMap.newKeySet();
+    public static transient Set<MemoryHWIDEntity> db = ConcurrentHashMap.newKeySet();
 
     @Override
     public Map<String, Command> getCommands() {

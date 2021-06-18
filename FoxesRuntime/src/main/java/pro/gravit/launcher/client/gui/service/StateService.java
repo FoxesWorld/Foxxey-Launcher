@@ -2,12 +2,9 @@ package pro.gravit.launcher.client.gui.service;
 
 import pro.gravit.launcher.client.ServerPinger;
 import pro.gravit.launcher.events.request.AuthRequestEvent;
-import pro.gravit.launcher.events.request.PingServerRequestEvent;
 import pro.gravit.launcher.events.request.ProfilesRequestEvent;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launcher.profiles.PlayerProfile;
-import pro.gravit.launcher.profiles.optional.OptionalFile;
-import pro.gravit.launcher.profiles.optional.OptionalTrigger;
 import pro.gravit.launcher.profiles.optional.OptionalView;
 import pro.gravit.launcher.request.Request;
 import pro.gravit.launcher.request.management.PingServerReportRequest;
@@ -94,53 +91,24 @@ public class StateService {
         {
             this.optionalViewMap.put(profile, new OptionalView(profile));
         }
-        //Triggers
-        this.optionalViewMap.forEach((profile, view) -> {
-            for (OptionalFile optionalFile : profile.getOptional()) {
-                if (optionalFile.triggers == null)
-                    continue;
-                if(optionalFile.permissions != 0 && rawAuthResult != null && rawAuthResult.permissions != null) {
-                    optionalFile.visible = (optionalFile.permissions & rawAuthResult.permissions.permissions) == optionalFile.permissions;
-                }
-
-                boolean anyTriggered = false;
-                boolean anyNeed = false;
-                boolean allNeedTriggered = false;
-
-                for (OptionalTrigger trigger : optionalFile.triggers) {
-                    boolean isTriggered = trigger.isTriggered();
-                    if (isTriggered)
-                        anyTriggered = true;
-                    if (trigger.need) {
-                        if (!anyNeed) {
-                            anyNeed = true;
-                            allNeedTriggered = isTriggered;
-                        } else {
-                            if (allNeedTriggered)
-                                allNeedTriggered = isTriggered;
-                        }
-                    }
-                }
-
-                if (!anyNeed) {
-                    if (anyTriggered)
-                        view.enable(optionalFile, false, null);
-                } else {
-                    if (allNeedTriggered) {
-                        view.enable(optionalFile, false, null);
-                    } else {
-                        optionalFile.visible = false;
-                        view.disable(optionalFile, null);
-                    }
-                }
-            }
-        });
     }
 
     public String getUsername() {
         if (rawAuthResult == null || rawAuthResult.playerProfile == null)
             return "Player";
         return rawAuthResult.playerProfile.username;
+    }
+
+    public int getGroupId() {
+        if (rawAuthResult == null)
+            return 4;
+        return rawAuthResult.groupId;
+    }
+
+    public int getGetBalance() {
+        if (rawAuthResult == null)
+            return 0;
+        return rawAuthResult.balance;
     }
 
     public List<ClientProfile> getProfiles() {
@@ -157,6 +125,10 @@ public class StateService {
 
     public OptionalView getOptionalView() {
         return this.optionalViewMap.get(this.profile);
+    }
+
+    public OptionalView getOptionalView(ClientProfile profile) {
+        return this.optionalViewMap.get(profile);
     }
 
     public PlayerProfile getPlayerProfile() {

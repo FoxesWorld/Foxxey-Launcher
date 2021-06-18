@@ -14,7 +14,7 @@ public class FileSystemAuthProvider extends AuthProvider {
     public String errorMessage = "Login or password incorrect";
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws Exception {
         if (!(password instanceof AuthPlainPassword)) {
             throw new AuthException("password type not supported");
         }
@@ -24,7 +24,7 @@ public class FileSystemAuthProvider extends AuthProvider {
         if (entity == null || !entity.verifyPassword(passwd)) {
             throw new AuthException(errorMessage);
         }
-        return new AuthProviderResult(entity.username, SecurityHelper.randomStringToken(), entity.permissions);
+        return new AuthProviderResult(entity.username, SecurityHelper.randomStringToken(), entity.permissions, 0, 4);
     }
 
     @Override

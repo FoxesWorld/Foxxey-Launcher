@@ -27,6 +27,7 @@ public class Client {
     public UUID uuid;
     public TrustLevel trustLevel;
     public int groupId;
+    public int balance;
 
     public transient AuthProviderPair auth;
 
@@ -52,6 +53,7 @@ public class Client {
         username = "";
         checkSign = false;
         groupId = 4;
+        balance = 0;
     }
 
     //Данные авторизации

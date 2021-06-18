@@ -47,11 +47,11 @@ public class AuthManager {
      *
      * @return AuthContext instance
      */
-    public AuthResponse.AuthContext makeAuthContext(Client client, AuthResponse.ConnectTypes authType, AuthProviderPair pair, String login, String profileName, String ip) {
+    public AuthResponse.AuthContext makeAuthContext(Client client, AuthResponse.ConnectTypes authType, AuthProviderPair pair, String login, String profileName, String ip, String hwid) {
         Objects.requireNonNull(client, "Client must be not null");
         Objects.requireNonNull(authType, "authType must be not null");
         Objects.requireNonNull(pair, "AuthProviderPair must be not null");
-        return new AuthResponse.AuthContext(client, login, profileName, ip, authType, pair);
+        return new AuthResponse.AuthContext(client, login, profileName, ip, authType, pair, hwid);
     }
 
     /**
@@ -85,7 +85,7 @@ public class AuthManager {
                 report = AuthReport.ofMinecraftAccessToken(authWithProviderAndHandler(context, password));
             } catch (Exception e) {
                 if (e instanceof AuthException) throw (AuthException) e;
-                throw new AuthException("Internal Auth Error. Please contact administrator");
+                throw new AuthException("Internal Auth Error. Please contact administrator ");
             }
         } else {
             report = authWithCore(context, password);
@@ -97,7 +97,7 @@ public class AuthManager {
     private String authWithProviderAndHandler(AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password) throws Exception {
         String accessToken;
         context.pair.provider.preAuth(context.login, password, context.ip);
-        AuthProviderResult aresult = context.pair.provider.auth(context.login, password, context.ip);
+        AuthProviderResult aresult = context.pair.provider.auth(context.login, password, context.ip, context.hwid);
         UUID uuid;
         String username = aresult.username != null ? aresult.username : context.login;
         if (aresult instanceof AuthProviderDAOResult) {
@@ -110,7 +110,7 @@ public class AuthManager {
             uuid = context.pair.handler.usernameToUUID(aresult.username);
             accessToken = null;
         }
-        internalAuth(context.client, context.authType, context.pair, username, uuid, aresult.permissions, false);
+        internalAuth(context.client, context.authType, context.pair, username, aresult.groupId, uuid, aresult.balance, aresult.permissions, false);
         return accessToken;
     }
 
@@ -131,7 +131,7 @@ public class AuthManager {
             User user = session.getUser();
             context.client.coreObject = user;
             context.client.sessionObject = session;
-            internalAuth(context.client, context.authType, context.pair, user.getUsername(), user.getUUID(), user.getPermissions(), true);
+            internalAuth(context.client, context.authType, context.pair, user.getUsername(), 4, user.getUUID(), 0, user.getPermissions(), true);
             if (context.authType == AuthResponse.ConnectTypes.CLIENT && server.config.protectHandler.allowGetAccessToken(context)) {
                 return AuthReport.ofMinecraftAccessToken(user.getAccessToken());
             }
@@ -177,7 +177,7 @@ public class AuthManager {
                 }
             }
             context.client.coreObject = user;
-            internalAuth(context.client, context.authType, context.pair, user.getUsername(), user.getUUID(), user.getPermissions(), result.isUsingOAuth());
+            internalAuth(context.client, context.authType, context.pair, user.getUsername(), 4, user.getUUID(), 0, user.getPermissions(), result.isUsingOAuth());
             return result;
         } else {
             if (report.needMoreFactor) {
@@ -195,7 +195,8 @@ public class AuthManager {
     /**
      * Writing authorization information to the Client object
      */
-    public void internalAuth(Client client, AuthResponse.ConnectTypes authType, AuthProviderPair pair, String username, UUID uuid, ClientPermissions permissions, boolean oauth) {
+    public void internalAuth(Client client, AuthResponse.ConnectTypes authType, AuthProviderPair pair, String username,
+                             int groupId, UUID uuid, int balance, ClientPermissions permissions, boolean oauth) {
         client.isAuth = true;
         client.permissions = permissions;
         client.auth_id = pair.name;
@@ -204,6 +205,8 @@ public class AuthManager {
         client.type = authType;
         client.uuid = uuid;
         client.useOAuth = oauth;
+        client.balance = balance;
+        client.groupId = groupId;
         if (pair.isUseCore() && client.coreObject == null) {
             client.coreObject = pair.core.getUserByUUID(uuid);
         }

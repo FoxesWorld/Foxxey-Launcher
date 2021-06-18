@@ -32,13 +32,15 @@ public class ProfilesResponse extends SimpleResponse {
             profileList = new ArrayList<>(4);
             for (ClientProfile profile : serverProfiles) {
                 if (protectHandler.canGetProfile(profile, client)) {
-                    profileList.add(profile);
+                    if (profile.getClientGroup() == client.groupId || profile.getClientGroup() == 4) {
+                        profileList.add(profile);
+                    }
                 }
             }
         } else {
             profileList = serverProfiles
                     .stream()
-                    .filter(clientProfile -> clientProfile.getClientGroup() == client.groupId)
+                    .filter(clientProfile -> clientProfile.getClientGroup() == client.groupId && clientProfile.getClientGroup() == 4)
                     .collect(Collectors.toList());
         }
         sendResult(new ProfilesRequestEvent(profileList));

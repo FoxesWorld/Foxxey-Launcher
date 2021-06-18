@@ -12,7 +12,7 @@ public class HibernateAuthProvider extends AuthProvider implements RequiredDAO {
     public boolean autoReg;
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws Exception {
         if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         User user = srv.config.dao.userDAO.findByUsername(login);
         if (user == null && autoReg) {

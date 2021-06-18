@@ -21,7 +21,7 @@ public final class JsonAuthProvider extends AuthProvider {
     public String apiKey;
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws IOException {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws IOException {
         String firstPassword;
         String secondPassword;
         if (!enable2FA) {
@@ -49,7 +49,7 @@ public final class JsonAuthProvider extends AuthProvider {
             return authError("Authentication server response is malformed");
         authResult result = Launcher.gsonManager.gson.fromJson(content, authResult.class);
         if (result.username != null)
-            return new AuthProviderResult(result.username, SecurityHelper.randomStringToken(), new ClientPermissions(result.permissions, result.flags));
+            return new AuthProviderResult(result.username, SecurityHelper.randomStringToken(), new ClientPermissions(result.permissions, result.flags), 0, 4);
         else return authError(Objects.requireNonNullElse(result.error, "Authentication server response is malformed"));
     }
 

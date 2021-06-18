@@ -29,7 +29,7 @@ public final class MojangAuthProvider extends AuthProvider {
     }
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws Exception {
         if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         mojangAuth mojangAuth = new mojangAuth(login, ((AuthPlainPassword) password).password);
         JsonElement request = gson.toJsonTree(mojangAuth);

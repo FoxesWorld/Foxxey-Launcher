@@ -34,6 +34,8 @@ public class OptionalFile {
     @LauncherNetworkAPI
     public String info;
     @LauncherNetworkAPI
+    public List<pro.gravit.launcher.profiles.optional.triggers.OptionalTrigger> triggersList;
+    @LauncherNetworkAPI
     public OptionalTrigger[] triggers;
     @LauncherNetworkAPI
     public OptionalDepend[] dependenciesFile;

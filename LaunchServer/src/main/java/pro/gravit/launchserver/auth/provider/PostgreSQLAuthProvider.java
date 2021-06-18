@@ -22,7 +22,7 @@ public final class PostgreSQLAuthProvider extends AuthProvider {
     private boolean flagsEnabled;
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws SQLException, AuthException {
         if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         try (Connection c = postgreSQLHolder.getConnection(); PreparedStatement s = c.prepareStatement(query)) {
             String[] replaceParams = {"login", login, "password", ((AuthPlainPassword) password).password, "ip", ip};
@@ -34,7 +34,7 @@ public final class PostgreSQLAuthProvider extends AuthProvider {
             s.setQueryTimeout(PostgreSQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
                 return set.next() ? new AuthProviderResult(set.getString(1), SecurityHelper.randomStringToken(), new ClientPermissions(
-                        set.getLong(2), flagsEnabled ? set.getLong(3) : 0)) : authError(message);
+                        set.getLong(2), flagsEnabled ? set.getLong(3) : 0), 0, 4) : authError(message);
             }
         }
     }

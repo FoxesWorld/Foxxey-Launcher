@@ -4,6 +4,7 @@ import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
+import pro.gravit.launcher.client.events.ClientUnlockConsoleEvent;
 import pro.gravit.launcher.gui.RuntimeProvider;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -47,6 +48,7 @@ public class JavaRuntimeModule extends LauncherModule {
         registerEvent(this::preGuiPhase, ClientPreGuiPhase.class);
         registerEvent(this::engineInitPhase, ClientEngineInitPhase.class);
         registerEvent(this::exitPhase, ClientExitPhase.class);
+        registerEvent(this::consoleUnlock, ClientUnlockConsoleEvent.class);
     }
 
     private void preGuiPhase(ClientPreGuiPhase phase) {
@@ -58,6 +60,12 @@ public class JavaRuntimeModule extends LauncherModule {
         }
         provider = new StdJavaRuntimeProvider();
         phase.runtimeProvider = provider;
+    }
+
+    private void consoleUnlock(ClientUnlockConsoleEvent event) {
+        if(engine.runtimeProvider instanceof StdJavaRuntimeProvider) {
+            ((StdJavaRuntimeProvider) engine.runtimeProvider).registerPrivateCommands();
+        }
     }
 
     private void engineInitPhase(ClientEngineInitPhase initPhase) {

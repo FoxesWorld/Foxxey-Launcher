@@ -30,18 +30,19 @@ public final class AuthCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        verifyArgs(args, 2);
+        verifyArgs(args, 3);
         AuthProviderPair pair;
-        if (args.length > 2) pair = server.config.getAuthProviderPair(args[2]);
+        if (args.length > 3) pair = server.config.getAuthProviderPair(args[2]);
         else pair = server.config.getAuthProviderPair();
         if (pair == null) throw new IllegalStateException(String.format("Auth %s not found", args[1]));
 
         String login = args[0];
         String password = args[1];
+        String hwid = args[2];
 
         // Authenticate
         AuthProvider provider = pair.provider;
-        AuthProviderResult result = provider.auth(login, new AuthPlainPassword(password), "127.0.0.1");
+        AuthProviderResult result = provider.auth(login, new AuthPlainPassword(password), "127.0.0.1", hwid);
         UUID uuid = pair.handler.auth(result);
 
         // Print auth successful message

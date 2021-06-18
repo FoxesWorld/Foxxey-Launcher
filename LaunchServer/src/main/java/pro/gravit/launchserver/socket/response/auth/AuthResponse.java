@@ -16,6 +16,7 @@ public class AuthResponse extends SimpleResponse {
     public String login;
     public String client;
     public boolean getSession;
+    public String hardwareId;
 
     public AuthRequest.AuthPasswordInterface password;
 
@@ -38,7 +39,7 @@ public class AuthResponse extends SimpleResponse {
                 sendError("auth_id incorrect");
                 return;
             }
-            AuthContext context = server.authManager.makeAuthContext(clientData, authType, pair, login, client, ip);
+            AuthContext context = server.authManager.makeAuthContext(clientData, authType, pair, login, client, ip, hardwareId);
             server.authManager.check(context);
             password = server.authManager.decryptPassword(password);
             server.authHookManager.preHook.hook(context, clientData);
@@ -57,6 +58,8 @@ public class AuthResponse extends SimpleResponse {
                 result.accessToken = context.report.minecraftAccessToken;
             }
             result.playerProfile = server.authManager.getPlayerProfile(clientData);
+            result.balance = context.client.balance;
+            result.groupId = context.client.groupId;
             sendResult(result);
         } catch (AuthException | HookException e) {
             sendError(e.getMessage());
@@ -74,6 +77,7 @@ public class AuthResponse extends SimpleResponse {
         public final String login;
         public final String profileName;
         public final String ip;
+        public final String hwid;
         public final ConnectTypes authType;
         public final Client client;
         public final AuthProviderPair pair;
@@ -81,13 +85,14 @@ public class AuthResponse extends SimpleResponse {
         @Deprecated
         public int password_length; //Use AuthProvider for get password
 
-        public AuthContext(Client client, String login, String profileName, String ip, ConnectTypes authType, AuthProviderPair pair) {
+        public AuthContext(Client client, String login, String profileName, String ip, ConnectTypes authType, AuthProviderPair pair, String hwid) {
             this.client = client;
             this.login = login;
             this.profileName = profileName;
             this.ip = ip;
             this.authType = authType;
             this.pair = pair;
+            this.hwid = hwid;
         }
     }
 }

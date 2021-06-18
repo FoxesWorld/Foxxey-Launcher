@@ -7,8 +7,8 @@ import pro.gravit.utils.helper.SecurityHelper;
 public final class AcceptAuthProvider extends AuthProvider {
 
     @Override
-    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) {
-        return new AuthProviderResult(login, SecurityHelper.randomStringToken(), ClientPermissions.DEFAULT); // Same as login
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) {
+        return new AuthProviderResult(login, SecurityHelper.randomStringToken(), ClientPermissions.DEFAULT, 0, 4); // Same as login
     }
 
     @Override

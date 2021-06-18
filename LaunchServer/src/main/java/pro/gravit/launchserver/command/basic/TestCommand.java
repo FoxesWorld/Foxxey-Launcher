@@ -67,7 +67,7 @@ public class TestCommand extends Command {
                 long startTime = System.currentTimeMillis();
                 for (int i = 0; i < 100000; ++i) {
                     try {
-                        pair.provider.auth("Test", plainPassword, "127.0.0.1");
+                        pair.provider.auth("Test", plainPassword, "127.0.0.1", "test");
                     } catch (AuthException ignored) {
 
                     } catch (Exception e) {

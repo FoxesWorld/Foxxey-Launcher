@@ -54,9 +54,8 @@ public class FormatHelper {
     }
 
     public static String ansiFormatVersion(String product) {
-        return new Ansi().bold(). // Setup
-                fgBright(Ansi.Color.MAGENTA).a("FoxesWorld ").
-                fgBright(Ansi.Color.CYAN).a(product). // Product
+        return new Ansi().bold().fgRgb(255, 92, 17).a("FoxesWorld ").
+                fgRgb(72, 209, 204).a(product). // Product
                 fgBright(Ansi.Color.WHITE).a(" v").fgBright(Ansi.Color.BLUE).a(Version.getVersion().toString()). // Version
                 fgBright(Ansi.Color.WHITE).a(" (build #").fgBright(Ansi.Color.RED).a(Version.getVersion().build).fgBright(Ansi.Color.WHITE).a(')'). // Build#
                 reset().toString(); // To file
@@ -64,8 +63,8 @@ public class FormatHelper {
 
     public static String ansiFormatLicense(String product) {
         return new Ansi().bold(). // Setup
-                fgBright(Ansi.Color.MAGENTA).a("License for ").
-                fgBright(Ansi.Color.CYAN).a(product). // Product
+                fgRgb(255, 92, 17).a("License for ").
+                fgRgb(72, 209, 204).a(product). // Product
                 fgBright(Ansi.Color.WHITE).a(" GNU GPLv3").fgBright(Ansi.Color.WHITE).a(". SourceCode: "). // Version
                 fgBright(Ansi.Color.YELLOW).a("https://github.com/FoxesWorld/GradleLauncher").
                 reset().toString(); // To file

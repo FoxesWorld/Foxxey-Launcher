@@ -49,7 +49,7 @@ public class SendAuthCommand extends Command {
         if (pair == null) {
             clientUUID = args.length > 5 ? UUID.fromString(args[5]) : UUID.randomUUID();
         } else {
-            clientUUID = pair.handler.auth(new AuthProviderResult(username, accessToken, permissions));
+            clientUUID = pair.handler.auth(new AuthProviderResult(username, accessToken, permissions, 0, 4));
         }
         WebSocketService service = server.nettyServerSocketHandler.nettyServer.service;
         service.channels.forEach((channel -> {

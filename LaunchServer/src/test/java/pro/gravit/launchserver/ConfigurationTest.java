@@ -62,10 +62,10 @@ public class ConfigurationTest {
     public void reloadTest() throws Exception {
         AuthProvider provider = new AuthProvider() {
             @Override
-            public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
+            public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip, String hwid) throws Exception {
                 if (!(password instanceof AuthPlainPassword)) throw new UnsupportedOperationException();
                 if (login.equals("test") && ((AuthPlainPassword) password).password.equals("test")) {
-                    return new AuthProviderResult(login, SecurityHelper.randomStringToken(), new ClientPermissions());
+                    return new AuthProviderResult(login, SecurityHelper.randomStringToken(), new ClientPermissions(), 0, 4);
                 }
                 throw new AuthException("Incorrect password");
             }
