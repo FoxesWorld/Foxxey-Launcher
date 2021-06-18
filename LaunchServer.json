@@ -1,0 +1,160 @@
+{
+  "projectName": "FoxesWorld",
+  "mirrors": [
+    "https://mirror.gravit.pro/",
+    "https://gravit-launcher-mirror.storage.googleapis.com/"
+  ],
+  "binaryName": "Launcher",
+  "copyBinaries": true,
+  "cacheUpdates": true,
+  "env": "STD",
+  "auth": {
+    "std": {
+      "isDefault": true,
+      "provider": {
+        "type": "request",
+	    "url": "https://login.foxesworld.ru/foxxey/launcher.php?auth&login=%login%&password=%password%&hwid=%hwid%",
+		"response": "OK:(?<username>.+):(?<permissions>.+)",
+	    "usePermission": false,
+	    "flagsEnabled": false,
+	    "loginName": "login",
+	    "regDateName": "regDate",
+	    "userGroupName": "userGroup",
+	    "balanceName": "balance",
+	    "hardwareIdName": "hardwareId",
+	    "messageName": "message"
+      },
+      "handler": {
+        "type": "memory"
+      },
+      "textureProvider": {
+        "skinURL": "https://login.foxesworld.ru/foxxey/MinecraftSkins/%username%.png",
+        "cloakURL": "https://login.foxesworld.ru/foxxey/MinecraftCloaks/%username%.png",
+        "type": "request"
+      },
+      "displayName": "Default"
+    }
+  },
+  "sessions": {
+    "autoDump": false,
+    "dumpFile": "sessions.json",
+    "type": "memory"
+  },
+  "protectHandler": {
+    "profileWhitelist": {},
+    "allowUpdates": [],
+    "type": "std"
+  },
+  "components": {
+    "regLimiter": {
+      "message": "Превышен лимит регистраций",
+      "excludeIps": [],
+      "exclude": [],
+      "rateLimit": 3,
+      "rateLimitMillis": 36000000,
+      "type": "regLimiter"
+    },
+    "authLimiter": {
+      "message": "Превышен лимит авторизаций",
+      "exclude": [],
+      "rateLimit": 3,
+      "rateLimitMillis": 8000,
+      "type": "authLimiter"
+    },
+    "proguard": {
+      "modeAfter": "MainBuild",
+      "dir": "proguard",
+      "enabled": false,
+      "mappings": false,
+      "type": "proguard"
+    }
+  },
+  "launch4j": {
+    "enabled": true,
+    "setMaxVersion": false,
+    "maxVersion": "1.8.999",
+    "minVersion": "1.8.0",
+    "downloadUrl": "https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html",
+    "productName": "FoxesLauncher",
+    "productVer": "1.0.0.1",
+    "fileDesc": "FoxesLauncher",
+    "fileVer": "1.0.0.1",
+    "internalName": "Launcher",
+    "copyright": "© FoxesWorld",
+    "trademarks": "This product is licensed under GPLv3",
+    "txtFileVersion": "%s, build %d",
+    "txtProductVersion": "%s, build %d"
+  },
+  "netty": {
+    "fileServerEnabled": true,
+    "sendExceptionEnabled": false,
+    "ipForwarding": false,
+    "disableWebApiInterface": false,
+    "showHiddenFiles": false,
+    "launcherURL": "https://foxesworld.ru:9274/Launcher.jar",
+    "downloadURL": "https://foxesworld.ru:9274/%dirname%/",
+    "launcherEXEURL": "https://foxesworld.ru:9274/Launcher.exe",
+    "address": "ws://foxesworld.ru:9274/api",
+    "bindings": {},
+    "performance": {
+      "usingEpoll": false,
+      "bossThread": 2,
+      "workerThread": 8,
+      "schedulerThread": 2,
+      "sessionLifetimeMs": 86400000,
+      "maxWebSocketRequestBytes": 1048576
+    },
+    "binds": [
+      {
+        "address": "foxesworld.ru",
+        "port": 9274
+      }
+    ],
+    "logLevel": "DEBUG"
+  },
+  "launcher": {
+    "guardType": "no",
+    "compress": true,
+    "warningMissArchJava": false,
+    "stripLineNumbers": true,
+    "deleteTempFiles": true,
+    "certificatePinning": false,
+    "encryptRuntime": false,
+    "memoryLimit": 256
+  },
+  "sign": {
+    "enabled": false,
+    "keyStore": "pathToKey",
+    "keyStoreType": "JKS",
+    "keyStorePass": "mypass",
+    "keyAlias": "myname",
+    "keyPass": "mypass",
+    "metaInfKeyName": "SIGNUMO.RSA",
+    "metaInfSfName": "SIGNUMO.SF",
+    "signAlgo": "SHA256WITHRSA"
+  },
+  "startScript": "./startscreen.sh",
+    "clientProfileProvider": {
+	  "type": "mysql",
+	  "mySQLHolder": {
+		  "address": "foxesworld.ru",  
+		  "port": 3306,
+		  "username": "fox",
+		  "password": "greenTroll255709",
+		  "database": "fox_launcher",
+		  "useHikari": true
+	  },
+	  "tableServers": "servers",
+	  "columnName": "Server_name",
+	  "columnServerAddress": "adress",
+	  "columnServerPort": "port",
+	  "columnSrvImage": "srv_image",
+	  "columnVersion": "version",
+	  "columnStory": "story",
+	  "columnSrvGroup": "srv_group",
+	  "columnEnabled": "enabled",
+	  "columnClientArgs": "clientArgs",
+	  "columnMainClass": "mainClass",
+	  "columnJvmArgs": "jvmArgs"
+  }
+}
