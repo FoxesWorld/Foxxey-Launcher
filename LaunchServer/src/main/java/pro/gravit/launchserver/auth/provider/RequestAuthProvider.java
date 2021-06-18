@@ -19,25 +19,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.regex.Pattern;
 
 public final class RequestAuthProvider extends AuthProvider {
     private transient final HttpClient client = HttpClient.newBuilder()
             .build();
     public String url;
-    public transient Pattern pattern;
-    public String response;
-    public boolean flagsEnabled;
-    public boolean usePermission = true;
     public int timeout = 5000;
 
     @Override
     public void init(LaunchServer srv) {
         super.init(srv);
         if (url == null) throw new RuntimeException("[Verify][AuthProvider] url cannot be null");
-        if (response == null) throw new RuntimeException("[Verify][AuthProvider] response cannot be null");
-        pattern = Pattern.compile(response);
-
     }
 
     @Override
