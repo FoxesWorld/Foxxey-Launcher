@@ -26,4 +26,8 @@ public abstract class NewsProvider {
     public void close() {
         // Do nothing as default
     }
+
+    public void sync() {
+        // Do nothing as default
+    }
 }
