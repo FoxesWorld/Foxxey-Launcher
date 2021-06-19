@@ -1,12 +1,9 @@
 package pro.gravit.launchserver.command.news;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 
-public class SyncNewsCommand extends Command {
-    private transient final Logger logger = LogManager.getLogger(SyncNewsCommand.class);
+public final class SyncNewsCommand extends Command {
 
     public SyncNewsCommand(LaunchServer server) {
         super(server);
@@ -25,6 +22,5 @@ public class SyncNewsCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         server.config.newsProvider.sync();
-        logger.info("News syncing..");
     }
 }

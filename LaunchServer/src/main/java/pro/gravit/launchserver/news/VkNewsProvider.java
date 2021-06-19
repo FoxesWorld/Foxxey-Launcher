@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 
 public final class VkNewsProvider extends NewsProvider {
 
-    private static final Logger logger = LogManager.getLogger(VkNewsProvider.class);
+    private transient final Logger logger = LogManager.getLogger();
     private transient final List<News> newsList = new ArrayList<>();
     private transient final ExecutorService executorService = Executors.newFixedThreadPool(2);
     private transient VkApiClient vkApiClient;
@@ -54,24 +54,27 @@ public final class VkNewsProvider extends NewsProvider {
 
                     @Override
                     public void wallPostNew(Integer groupId, Wallpost wallpost) {
-                        logger.info("Process posted news");
                         processWallpost(wallpost);
+                        logger.info("Posted news fetched");
                     }
                 }.run();
             } catch (ClientException | ApiException e) {
                 e.printStackTrace();
             }
         });
-        logger.info("Fetch news");
         executorService.execute(this::fetchNews);
     }
 
     public void fetchNews() {
+        long startTimeMillis = System.currentTimeMillis();
+        logger.info("Fetching news..");
         try {
             vkApiClient.wall().get(serviceActor).domain(domain).count(maxNews).execute().getItems().forEach(this::processWallpost);
         } catch (ApiException | ClientException e) {
             e.printStackTrace();
         }
+        long fetchingTimeInMillis = System.currentTimeMillis() - startTimeMillis;
+        logger.info("News fetched in " + fetchingTimeInMillis + " millis");
     }
 
     private void verify() {
@@ -147,9 +150,6 @@ public final class VkNewsProvider extends NewsProvider {
     @Override
     public void sync() {
         newsList.clear();
-        executorService.execute(() -> {
-            fetchNews();
-            logger.info("News synced");
-        });
+        executorService.execute(this::fetchNews);
     }
 }
