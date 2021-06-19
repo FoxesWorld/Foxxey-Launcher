@@ -21,7 +21,6 @@ public abstract class AbstractVisualComponent {
     protected AbstractStage currentStage;
     protected Pane layout;
     private final String sysFxmlPath;
-    private Parent sysFxmlRoot;
     boolean isInit;
     protected boolean isResetOnShow = false;
 
@@ -51,12 +50,9 @@ public abstract class AbstractVisualComponent {
 
     public abstract String getName();
 
-    protected synchronized Parent getFxmlRoot() {
+    protected Parent getFxmlRoot() {
         try {
-            if(sysFxmlRoot == null) {
-                sysFxmlRoot = (Parent) application.fxmlFactory.getAsync(sysFxmlPath).get();
-            }
-            return sysFxmlRoot;
+            return  (Parent) application.fxmlFactory.getAsync(sysFxmlPath).get();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {

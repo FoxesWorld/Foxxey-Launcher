@@ -6,11 +6,11 @@ __FoxesWorld__ launcher
 - Rewrite filesLoad
 - Add optional files to every client
 - Add optional server settings
-- Add VK group parser
 - Include __FoxesWorld__ libraries - `foxesSound`, `startUpSound`
 
 **WAS DONE**
 
+- Add VK group parser
 - ServerLauncher reload
 - Authorisation
 - Skins and Cloaks parser

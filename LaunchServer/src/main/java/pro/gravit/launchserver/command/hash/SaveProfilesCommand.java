@@ -237,7 +237,7 @@ public class SaveProfilesCommand extends Command {
                 saveProfile(profile, profilePath);
                 logger.info("Profile {} save successful", profilePath.toString());
             }
-            server.syncProfilesDir();
+            server.syncProfiles();
         }
     }
 
