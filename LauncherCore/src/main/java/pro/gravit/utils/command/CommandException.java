@@ -1,6 +1,6 @@
 package pro.gravit.utils.command;
 
-public class CommandException extends Exception {
+public final class CommandException extends Exception {
     private static final long serialVersionUID = -6588814993972117772L;
 
 

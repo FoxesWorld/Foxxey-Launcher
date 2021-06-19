@@ -9,11 +9,8 @@ import pro.gravit.launcher.client.gui.helper.LookupHelper;
 import pro.gravit.launcher.client.gui.scenes.AbstractScene;
 import pro.gravit.launcher.managers.ConsoleManager;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.command.UnknownCommandException;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
-
-import java.util.Locale;
 
 public class ConsoleScene extends AbstractScene {
     private static final long MAX_LENGTH = 16384;
@@ -63,11 +60,7 @@ public class ConsoleScene extends AbstractScene {
             ConsoleManager.handler.evalNative(command, false);
             commandLine.getStyleClass().removeAll("InputError");
         } catch (Exception ex) {
-            if (ex instanceof UnknownCommandException) {
-                LogHelper.error(ex.getMessage());
-            } else {
-                LogHelper.error(ex);
-            }
+            LogHelper.error(ex);
             commandLine.getStyleClass().add("InputError");
         }
     }

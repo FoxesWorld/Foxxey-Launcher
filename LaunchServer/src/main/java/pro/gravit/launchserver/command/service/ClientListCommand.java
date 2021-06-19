@@ -7,7 +7,7 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 
 public class ClientListCommand extends Command {
-    private transient final Logger logger = LogManager.getLogger(ClientListCommand.class);
+    private transient final Logger logger = LogManager.getLogger();
 
     public ClientListCommand(LaunchServer server) {
         super(server);
@@ -20,7 +20,7 @@ public class ClientListCommand extends Command {
 
     @Override
     public String getUsageDescription() {
-        return "Show all online client profiles";
+        return null;
     }
 
     @Override

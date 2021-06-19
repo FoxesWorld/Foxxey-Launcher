@@ -1,6 +1,5 @@
 package pro.gravit.utils.command;
 
-import jdk.jpackage.internal.Log;
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -19,11 +18,7 @@ public abstract class CommandHandler implements Runnable {
         try {
             evalNative(line, bell);
         } catch (Exception e) {
-            if (e instanceof UnknownCommandException) {
-                LogHelper.error(e.getMessage());
-            } else {
-                LogHelper.error(e);
-            }
+            LogHelper.error(e);
         }
     }
 
@@ -51,7 +46,7 @@ public abstract class CommandHandler implements Runnable {
     public Command lookup(String name) throws CommandException {
         Command command = findCommand(name);
         if (command == null)
-            throw new UnknownCommandException(name);
+            throw new CommandException(String.format("Unknown command: '%s'", name));
         return command;
     }
 

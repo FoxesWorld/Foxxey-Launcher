@@ -143,13 +143,4 @@ public final class VkNewsProvider extends NewsProvider {
     public void close() {
         executorService.shutdownNow();
     }
-
-    @Override
-    public void sync() {
-        newsList.clear();
-        executorService.execute(() -> {
-            fetchNews();
-            logger.info("News synced");
-        });
-    }
 }
