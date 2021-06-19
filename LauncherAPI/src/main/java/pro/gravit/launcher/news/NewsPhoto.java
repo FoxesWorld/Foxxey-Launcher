@@ -5,6 +5,7 @@ import java.util.Map;
 
 public final class NewsPhoto {
 
+
     private final Map<Size, String> sizesMap = new HashMap<>();
 
     public void put(Size photoSize, String photoUrl) {

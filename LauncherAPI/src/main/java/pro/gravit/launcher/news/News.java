@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public final class News {
 
+
     public final String title;
     public final String content;
     public final NewsPhoto[] newsPhotos;
