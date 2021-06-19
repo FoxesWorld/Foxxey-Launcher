@@ -26,7 +26,7 @@ public final class SyncProfilesCommand extends Command {
 
     @Override
     public void invoke(String... args) throws IOException {
-        server.syncProfiles();
+        server.syncProfilesDir();
         logger.info("Profiles successfully resynced");
     }
 }

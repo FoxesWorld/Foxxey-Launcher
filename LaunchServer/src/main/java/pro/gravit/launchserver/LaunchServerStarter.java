@@ -25,9 +25,8 @@ import pro.gravit.launchserver.dao.provider.DaoProvider;
 import pro.gravit.launchserver.manangers.CertificateManager;
 import pro.gravit.launchserver.manangers.LaunchServerGsonManager;
 import pro.gravit.launchserver.modules.impl.LaunchServerModulesManager;
-import pro.gravit.launchserver.news.NewsProvider;
 import pro.gravit.launchserver.socket.WebSocketService;
-import pro.gravit.launchserver.client.ClientProfileProvider;
+import pro.gravit.launchserver.socket.response.auth.ClientProfileProvider;
 import pro.gravit.utils.command.CommandHandler;
 import pro.gravit.utils.command.JLineCommandHandler;
 import pro.gravit.utils.command.StdCommandHandler;
@@ -209,7 +208,6 @@ public class LaunchServerStarter {
         Component.registerComponents();
         ProtectHandler.registerHandlers();
         ClientProfileProvider.registerProviders();
-        NewsProvider.registerProviders();
         WebSocketService.registerResponses();
         DaoProvider.registerProviders();
         AuthRequest.registerProviders();

@@ -8,7 +8,6 @@ import pro.gravit.launcher.hasher.HashedDir;
 import pro.gravit.launcher.managers.ConfigManager;
 import pro.gravit.launcher.managers.GarbageManager;
 import pro.gravit.launcher.modules.events.ClosePhase;
-import pro.gravit.launcher.news.News;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.session.MemorySessionStorage;
@@ -353,7 +352,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
                     // Sync profiles dir
                     if (!IOHelper.isDir(profilesDir))
                         Files.createDirectory(profilesDir);
-                    syncProfiles();
+                    syncProfilesDir();
                     modulesManager.invokeEvent(new LaunchServerProfilesSyncEvent(this));
                 } catch (IOException e) {
                     logger.error(e);
@@ -387,11 +386,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
 
     }
 
-    public List<News> getNews() {
-        return config.newsProvider.getNews();
-    }
-
-    public void syncProfiles() throws IOException {
+    public void syncProfilesDir() throws IOException {
         logger.info("Syncing profiles");
         profilesList = Set.copyOf(config.clientProfileProvider.getAll());
         if (pingServerManager != null)

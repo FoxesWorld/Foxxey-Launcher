@@ -88,7 +88,7 @@ public class FetchClientCommand extends Command {
             try (Writer w = IOHelper.newWriter(server.profilesDir.resolve(dirName + ".json"))) {
                 Launcher.gsonManager.configGson.toJson(profile, w);
             }
-            server.syncProfiles();
+            server.syncProfilesDir();
         } catch (Exception ex) {
             LogHelper.error(ex);
         }

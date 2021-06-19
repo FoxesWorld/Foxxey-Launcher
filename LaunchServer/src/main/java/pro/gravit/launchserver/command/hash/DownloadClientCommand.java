@@ -92,7 +92,7 @@ public final class DownloadClientCommand extends Command {
         }
 
         // Finished
-        server.syncProfiles();
+        server.syncProfilesDir();
         server.syncUpdatesDir(Collections.singleton(dirName));
         logger.info("Client successfully downloaded: '{}'", dirName);
     }
