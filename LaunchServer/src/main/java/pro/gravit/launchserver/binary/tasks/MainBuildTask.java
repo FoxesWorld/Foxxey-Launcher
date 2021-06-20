@@ -88,7 +88,7 @@ public class MainBuildTask implements LauncherBuildTask {
             try {
                 return e.getEncoded();
             } catch (CertificateEncodingException e2) {
-                logger.error(e2);
+                logger.error("Certificate encoding failed", e2);
                 return new byte[0];
             }
         }).collect(Collectors.toList());
