@@ -82,6 +82,7 @@ public abstract class ClientWebSocketService extends ClientJSONPoint {
     }
 
     public void registerResults() {
+        results.register("news", GetNewsEvent.class);
         results.register("auth", AuthRequestEvent.class);
         results.register("checkServer", CheckServerRequestEvent.class);
         results.register("joinServer", JoinServerRequestEvent.class);

@@ -8,6 +8,8 @@ import pro.gravit.launchserver.command.basic.*;
 import pro.gravit.launchserver.command.hash.*;
 import pro.gravit.launchserver.command.modules.LoadModuleCommand;
 import pro.gravit.launchserver.command.modules.ModulesCommand;
+import pro.gravit.launchserver.command.news.NewsListCommand;
+import pro.gravit.launchserver.command.news.SyncNewsCommand;
 import pro.gravit.launchserver.command.service.*;
 import pro.gravit.utils.command.BaseCommandCategory;
 import pro.gravit.utils.command.basic.ClearCommand;
@@ -45,6 +47,7 @@ public abstract class CommandHandler extends pro.gravit.utils.command.CommandHan
         updates.registerCommand("syncProfiles", new SyncProfilesCommand(server));
         updates.registerCommand("syncUP", new SyncUPCommand(server));
         updates.registerCommand("saveProfiles", new SaveProfilesCommand(server));
+        updates.registerCommand("syncNews", new SyncNewsCommand(server));
         Category updatesCategory = new Category(updates, "updates", "Update and Sync Management");
         handler.registerCategory(updatesCategory);
 
@@ -68,6 +71,7 @@ public abstract class CommandHandler extends pro.gravit.utils.command.CommandHan
         service.registerCommand("signDir", new SignDirCommand(server));
         service.registerCommand("pingServers", new PingServersCommand(server));
         service.registerCommand("securitycheck", new SecurityCheckCommand(server));
+        service.registerCommand("newsList", new NewsListCommand(server));
         Category serviceCategory = new Category(service, "service", "Managing LaunchServer Components");
         handler.registerCategory(serviceCategory);
     }

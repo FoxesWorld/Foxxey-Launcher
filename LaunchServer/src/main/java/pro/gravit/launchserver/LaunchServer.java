@@ -8,6 +8,7 @@ import pro.gravit.launcher.hasher.HashedDir;
 import pro.gravit.launcher.managers.ConfigManager;
 import pro.gravit.launcher.managers.GarbageManager;
 import pro.gravit.launcher.modules.events.ClosePhase;
+import pro.gravit.launcher.news.News;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.session.MemorySessionStorage;
@@ -338,7 +339,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
                 try {
                     close();
                 } catch (Exception e) {
-                    logger.error(e);
+                    logger.error("LaunchServer close error", e);
                 }
             }));
             CommonHelper.newThread("Command Thread", true, commandHandler).start();
@@ -352,11 +353,10 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
                     // Sync profiles dir
                     if (!IOHelper.isDir(profilesDir))
                         Files.createDirectory(profilesDir);
-                    syncProfilesDir();
+                    syncProfiles();
                     modulesManager.invokeEvent(new LaunchServerProfilesSyncEvent(this));
                 } catch (IOException e) {
-                    logger.error(e);
-                    logger.error("Updates/Profiles not synced");
+                    logger.error("Updates/Profiles not synced", e);
                 }
             }).start();
         }
@@ -367,7 +367,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
             modulesManager.invokeEvent(new LaunchServerFullInitEvent(this));
             logger.info("LaunchServer started");
         } catch (Throwable e) {
-            logger.error(e);
+            logger.error("LaunchServer startup failed",e);
             JVMHelper.RUNTIME.exit(-1);
         }
     }
@@ -386,7 +386,11 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
 
     }
 
-    public void syncProfilesDir() throws IOException {
+    public List<News> getNews() {
+        return config.newsProvider.getNews();
+    }
+
+    public void syncProfiles() throws IOException {
         logger.info("Syncing profiles");
         profilesList = Set.copyOf(config.clientProfileProvider.getAll());
         if (pingServerManager != null)
@@ -408,7 +412,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
         try {
             builder.start();
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("Restart failed", e);
         }
     }
 

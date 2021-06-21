@@ -18,7 +18,11 @@ public abstract class CommandHandler implements Runnable {
         try {
             evalNative(line, bell);
         } catch (Exception e) {
-            LogHelper.error(e);
+            if (e instanceof UnknownCommandException) {
+                LogHelper.error(e.getMessage());
+            } else {
+                LogHelper.error(e);
+            }
         }
     }
 
@@ -46,7 +50,7 @@ public abstract class CommandHandler implements Runnable {
     public Command lookup(String name) throws CommandException {
         Command command = findCommand(name);
         if (command == null)
-            throw new CommandException(String.format("Unknown command: '%s'", name));
+            throw new UnknownCommandException(name);
         return command;
     }
 

@@ -20,7 +20,7 @@ public class ClientListCommand extends Command {
 
     @Override
     public String getUsageDescription() {
-        return null;
+        return "Show all online client profiles";
     }
 
     @Override

@@ -26,7 +26,7 @@ public final class SyncUPCommand extends Command {
 
     @Override
     public void invoke(String... args) throws IOException {
-        server.syncProfilesDir();
+        server.syncProfiles();
         logger.info("Profiles successfully resynced");
 
         server.syncUpdatesDir(null);
