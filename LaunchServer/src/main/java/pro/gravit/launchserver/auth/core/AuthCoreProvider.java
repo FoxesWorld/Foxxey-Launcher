@@ -177,112 +177,114 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
         }
         {
             var instance = isSupport(AuthSupportHardware.class);
-            map.put("gethardwarebyid", new SubCommand("[id]", "get hardware by id") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 1);
-                    UserHardware hardware = instance.getHardwareInfoById(args[0]);
-                    if (hardware == null) {
-                        logger.info("UserHardware {} not found", args[0]);
-                    } else {
-                        logger.info("UserHardware: {}", hardware);
+            if (instance != null) {
+                map.put("gethardwarebyid", new SubCommand("[id]", "get hardware by id") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 1);
+                        UserHardware hardware = instance.getHardwareInfoById(args[0]);
+                        if (hardware == null) {
+                            logger.info("UserHardware {} not found", args[0]);
+                        } else {
+                            logger.info("UserHardware: {}", hardware);
+                        }
                     }
-                }
-            });
-            map.put("gethardwarebydata", new SubCommand("[json data]", "fulltext search hardware by json data(slow)") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 1);
-                    UserHardware hardware = instance.getHardwareInfoByData(Launcher.gsonManager.gson.fromJson(args[0], HardwareReportRequest.HardwareInfo.class));
-                    if (hardware == null) {
-                        logger.info("UserHardware {} not found", args[0]);
-                    } else {
-                        logger.info("UserHardware: {}", hardware);
+                });
+                map.put("gethardwarebydata", new SubCommand("[json data]", "fulltext search hardware by json data(slow)") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 1);
+                        UserHardware hardware = instance.getHardwareInfoByData(Launcher.gsonManager.gson.fromJson(args[0], HardwareReportRequest.HardwareInfo.class));
+                        if (hardware == null) {
+                            logger.info("UserHardware {} not found", args[0]);
+                        } else {
+                            logger.info("UserHardware: {}", hardware);
+                        }
                     }
-                }
-            });
-            map.put("getuserhardware", new SubCommand("[username]", "get hardware by username") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 1);
-                    User user = getUserByUUID(UUID.fromString(args[0]));
-                    if (user == null) {
-                        logger.info("User {} not found", args[0]);
+                });
+                map.put("getuserhardware", new SubCommand("[username]", "get hardware by username") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 1);
+                        User user = getUserByUUID(UUID.fromString(args[0]));
+                        if (user == null) {
+                            logger.info("User {} not found", args[0]);
+                        }
+                        UserSupportHardware hardware = instance.fetchUserHardware(user);
+                        if (hardware == null) {
+                            logger.error("Method fetchUserHardware return null");
+                            return;
+                        }
+                        UserHardware userHardware = hardware.getHardware();
+                        if (userHardware == null) {
+                            logger.info("User {} not contains hardware info", args[0]);
+                        } else {
+                            logger.info("UserHardware: {}", userHardware);
+                            logger.info("HardwareInfo(JSON): {}", Launcher.gsonManager.gson.toJson(userHardware.getHardwareInfo()));
+                        }
                     }
-                    UserSupportHardware hardware = instance.fetchUserHardware(user);
-                    if (hardware == null) {
-                        logger.error("Method fetchUserHardware return null");
-                        return;
+                });
+                map.put("findmulti", new SubCommand("[hardware id]", "get all users in one hardware id") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 1);
+                        UserHardware hardware = instance.getHardwareInfoById(args[0]);
+                        if (hardware == null) {
+                            logger.info("UserHardware {} not found", args[0]);
+                            return;
+                        }
+                        Iterable<User> users = instance.getUsersByHardwareInfo(hardware);
+                        for (User user : users) {
+                            logger.info("User {}", user);
+                        }
                     }
-                    UserHardware userHardware = hardware.getHardware();
-                    if (userHardware == null) {
-                        logger.info("User {} not contains hardware info", args[0]);
-                    } else {
-                        logger.info("UserHardware: {}", userHardware);
-                        logger.info("HardwareInfo(JSON): {}", Launcher.gsonManager.gson.toJson(userHardware.getHardwareInfo()));
+                });
+                map.put("banhardware", new SubCommand("[hardware id]", "ban hardware by id") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 1);
+                        UserHardware hardware = instance.getHardwareInfoById(args[0]);
+                        if (hardware == null) {
+                            logger.info("UserHardware {} not found", args[0]);
+                            return;
+                        }
+                        instance.banHardware(hardware);
+                        logger.info("UserHardware {} banned", args[0]);
                     }
-                }
-            });
-            map.put("findmulti", new SubCommand("[hardware id]", "get all users in one hardware id") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 1);
-                    UserHardware hardware = instance.getHardwareInfoById(args[0]);
-                    if (hardware == null) {
-                        logger.info("UserHardware {} not found", args[0]);
-                        return;
+                });
+                map.put("unbanhardware", new SubCommand("[hardware id]", "ban hardware by id") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 1);
+                        UserHardware hardware = instance.getHardwareInfoById(args[0]);
+                        if (hardware == null) {
+                            logger.info("UserHardware {} not found", args[0]);
+                            return;
+                        }
+                        instance.unbanHardware(hardware);
+                        logger.info("UserHardware {} unbanned", args[0]);
                     }
-                    Iterable<User> users = instance.getUsersByHardwareInfo(hardware);
-                    for (User user : users) {
-                        logger.info("User {}", user.getUsername());
+                });
+                map.put("comparehardware", new SubCommand("[json data 1] [json data 2]", "compare hardware info") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 2);
+                        HardwareReportRequest.HardwareInfo hardware1 = Launcher.gsonManager.gson.fromJson(args[0], HardwareReportRequest.HardwareInfo.class);
+                        HardwareReportRequest.HardwareInfo hardware2 = Launcher.gsonManager.gson.fromJson(args[1], HardwareReportRequest.HardwareInfo.class);
+                        HWIDProvider.HardwareInfoCompareResult result = instance.compareHardwareInfo(hardware1, hardware2);
+                        if (result == null) {
+                            logger.error("Method compareHardwareInfo return null");
+                            return;
+                        }
+                        logger.info("Compare result: {} Spoof: {} first {} second", result.compareLevel, result.firstSpoofingLevel, result.secondSpoofingLevel);
                     }
-                }
-            });
-            map.put("banhardware", new SubCommand("[hardware id]", "ban hardware by id") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 1);
-                    UserHardware hardware = instance.getHardwareInfoById(args[0]);
-                    if (hardware == null) {
-                        logger.info("UserHardware {} not found", args[0]);
-                        return;
-                    }
-                    instance.banHardware(hardware);
-                    logger.info("UserHardware {} banned", args[0]);
-                }
-            });
-            map.put("unbanhardware", new SubCommand("[hardware id]", "ban hardware by id") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 1);
-                    UserHardware hardware = instance.getHardwareInfoById(args[0]);
-                    if (hardware == null) {
-                        logger.info("UserHardware {} not found", args[0]);
-                        return;
-                    }
-                    instance.unbanHardware(hardware);
-                    logger.info("UserHardware {} unbanned", args[0]);
-                }
-            });
-            map.put("comparehardware", new SubCommand("[json data 1] [json data 2]", "compare hardware info") {
-                @Override
-                public void invoke(String... args) throws Exception {
-                    verifyArgs(args, 2);
-                    HardwareReportRequest.HardwareInfo hardware1 = Launcher.gsonManager.gson.fromJson(args[0], HardwareReportRequest.HardwareInfo.class);
-                    HardwareReportRequest.HardwareInfo hardware2 = Launcher.gsonManager.gson.fromJson(args[1], HardwareReportRequest.HardwareInfo.class);
-                    HWIDProvider.HardwareInfoCompareResult result = instance.compareHardwareInfo(hardware1, hardware2);
-                    if (result == null) {
-                        logger.error("Method compareHardwareInfo return null");
-                        return;
-                    }
-                    logger.info("Compare result: {} Spoof: {} first {} second", result.compareLevel, result.firstSpoofingLevel, result.secondSpoofingLevel);
-                }
-            });
+                });
+            }
         }
         return map;
     }
 
-    public User checkServer(@SuppressWarnings("unused") Client client, String username, String serverID) throws IOException {
+    public User checkServer(Client client, String username, String serverID) throws IOException {
         User user = getUserByUsername(username);
         if (user.getUsername().equals(username) && user.getServerId().equals(serverID)) {
             return user;
@@ -306,7 +308,6 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
     public abstract void close() throws IOException;
 
     public static class PasswordVerifyReport {
-        @SuppressWarnings("unused")
         public static final PasswordVerifyReport REQUIRED_2FA = new PasswordVerifyReport(-1);
         public static final PasswordVerifyReport FAILED = new PasswordVerifyReport(false);
         public static final PasswordVerifyReport OK = new PasswordVerifyReport(true);
@@ -326,14 +327,12 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
             this.factors = List.of(nextFactor);
         }
 
-        @SuppressWarnings("unused")
         public PasswordVerifyReport(List<Integer> factors) {
             this.success = false;
             this.needMoreFactor = false;
             this.factors = Collections.unmodifiableList(factors);
         }
 
-        @SuppressWarnings("unused")
         private PasswordVerifyReport(boolean success, boolean needMoreFactor, List<Integer> factors) {
             this.success = success;
             this.needMoreFactor = needMoreFactor;
@@ -345,12 +344,10 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
         public OAuthAccessTokenExpired() {
         }
 
-        @SuppressWarnings("unused")
         public OAuthAccessTokenExpired(String message) {
             super(message);
         }
 
-        @SuppressWarnings("unused")
         public OAuthAccessTokenExpired(String message, Throwable cause) {
             super(message, cause);
         }

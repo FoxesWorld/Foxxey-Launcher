@@ -12,17 +12,25 @@ import pro.gravit.launchserver.auth.provider.AcceptAuthProvider;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.components.ProGuardComponent;
 import pro.gravit.launchserver.config.LaunchServerConfig;
+import pro.gravit.launchserver.helper.SignHelper;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 public class SecurityCheckCommand extends Command {
     private static transient final Logger logger = LogManager.getLogger();
@@ -32,12 +40,17 @@ public class SecurityCheckCommand extends Command {
     }
 
     public static void printCheckResult(String module, String comment, Boolean status) {
-        logger.info(String.format("[%s] %s - %s", module, comment, status == null ? "WARN" : (status ? "OK" : "FAIL")), false);
+        if (status == null) {
+            logger.warn(String.format("[%s] %s", module, comment));
+        } else if (status) {
+            logger.info(String.format("[%s] %s OK", module, comment));
+        } else {
+            logger.error(String.format("[%s] %s", module, comment));
+        }
     }
 
     @Deprecated
-    public static void printCheckResult(@SuppressWarnings("unused") LogHelper.Level level, String module,
-                                        String comment, Boolean status) {
+    public static void printCheckResult(LogHelper.Level level, String module, String comment, Boolean status) {
         printCheckResult(module, comment, status);
     }
 
@@ -64,6 +77,9 @@ public class SecurityCheckCommand extends Command {
                 printCheckResult(String.format("auth.%s.handler", name), "MemoryAuthHandler test-only", false);
             } else {
                 printCheckResult(String.format("auth.%s.handler", name), "", true);
+            }
+            if(!pair.isUseCore()) {
+                printCheckResult(String.format("auth.%s", name), "AuthProvider/AuthHandler may be removed in future release", null);
             }
         });
         if (config.protectHandler instanceof NoProtectHandler) {
@@ -117,25 +133,30 @@ public class SecurityCheckCommand extends Command {
         if (!config.sign.enabled) {
             printCheckResult("sign", "it is recommended to use a signature", null);
         } else {
-            /*boolean bad = false;
-            KeyStore keyStore = SignHelper.getStore(new File(config.sign.keyStore).toPath(), config.sign.keyStorePass, config.sign.keyStoreType);
-            X509Certificate[] certChain = (X509Certificate[]) keyStore.getCertificateChain(config.sign.keyAlias);
-            X509Certificate cert = (X509Certificate) keyStore.getCertificate(config.sign.keyAlias);
-            cert.checkValidity();
-            if(certChain.length <= 1) {
-                printCheckResult("sign", "certificate chain contains <2 element(recommend 2 and more)", false);
+            boolean bad = false;
+            try {
+                KeyStore keyStore = SignHelper.getStore(new File(config.sign.keyStore).toPath(), config.sign.keyStorePass, config.sign.keyStoreType);
+                Certificate[] certChainPlain = keyStore.getCertificateChain(config.sign.keyAlias);
+                List<X509Certificate> certChain = Arrays.stream(certChainPlain).map(e -> (X509Certificate) e).collect(Collectors.toList());
+                X509Certificate cert = certChain.get(0);
+                cert.checkValidity();
+                if (certChain.size() <= 1) {
+                    printCheckResult("sign", "certificate chain contains <2 element(recommend 2 and more)", false);
+                    bad = true;
+                }
+                if ((cert.getBasicConstraints() & 1) == 1) {
+                    printCheckResult("sign", "end certificate - CA", false);
+                    bad = true;
+                }
+                for (X509Certificate certificate : certChain) {
+                    certificate.checkValidity();
+                }
+            } catch (Throwable e) {
+                logger.error("Sign check failed", e);
                 bad = true;
             }
-            if((cert.getBasicConstraints() & 1) != 0) {
-                printCheckResult("sign", "end certificate - CA", false);
-                bad = true;
-            }
-            for(X509Certificate certificate : certChain)
-            {
-                certificate.checkValidity();
-            }
-            if(!bad)*/
-            printCheckResult("sign", "", true);
+            if (!bad)
+                printCheckResult("sign", "", true);
         }
 
         if (config.components.values().stream().noneMatch(c -> c instanceof ProGuardComponent)) {
@@ -198,18 +219,21 @@ public class SecurityCheckCommand extends Command {
         //Linux permissions check
         if (JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
             try {
+                int uid = 0, gid = 0;
                 String[] status = new String(IOHelper.read(Paths.get("/proc/self/status"))).split("\n");
                 for (String line : status) {
                     String[] parts = line.split(":");
                     if (parts.length == 0) continue;
                     if (parts[0].trim().equalsIgnoreCase("Uid")) {
                         String[] words = parts[1].trim().split(" ");
+                        uid = Integer.parseInt(words[0]);
                         if (Integer.parseInt(words[0]) == 0 || Integer.parseInt(words[0]) == 0) {
                             logger.error("The process is started as root! It is not recommended");
                         }
                     }
                     if (parts[0].trim().equalsIgnoreCase("Gid")) {
                         String[] words = parts[1].trim().split(" ");
+                        gid = Integer.parseInt(words[0]);
                         if (Integer.parseInt(words[0]) == 0 || Integer.parseInt(words[0]) == 0) {
                             logger.error("The process is started as root group! It is not recommended");
                         }
@@ -218,8 +242,8 @@ public class SecurityCheckCommand extends Command {
                 if (checkOtherWriteAccess(IOHelper.getCodeSource(LaunchServer.class))) {
                     logger.warn("Write access to LaunchServer.jar. Please use 'chmod 755 LaunchServer.jar'");
                 }
-                if (Files.exists(server.dir.resolve("private.key")) && checkOtherReadOrWriteAccess(server.dir.resolve("private.key"))) {
-                    logger.warn("Write or read access to private.key. Please use 'chmod 600 private.key'");
+                if (Files.exists(server.dir.resolve(".keys")) && checkOtherReadOrWriteAccess(server.dir.resolve(".keys"))) {
+                    logger.warn("Write or read access to .keys directory. Please use 'chmod -R 600 .keys'");
                 }
                 if (Files.exists(server.dir.resolve("LaunchServerConfig.json")) && checkOtherReadOrWriteAccess(server.dir.resolve("LaunchServerConfig.json"))) {
                     logger.warn("Write or read access to LaunchServerConfig.json. Please use 'chmod 600 LaunchServerConfig.json'");
