@@ -75,7 +75,7 @@ public class FormatHelper {
     }
 
     public static String formatVersion(String product) {
-        return String.format("FoxesWorld %s v%s", product, Version.getVersion().toString());
+        return String.format("FoxesWorld %s v%s", product, Version.getVersion());
     }
 
     public static String formatLicense(String product) {
