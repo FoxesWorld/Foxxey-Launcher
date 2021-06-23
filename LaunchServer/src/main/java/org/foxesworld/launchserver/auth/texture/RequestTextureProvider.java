@@ -1,0 +1,54 @@
+package org.foxesworld.launchserver.auth.texture;
+
+import org.foxesworld.launcher.Launcher;
+import org.foxesworld.launcher.profiles.Texture;
+import org.foxesworld.utils.helper.CommonHelper;
+import org.foxesworld.utils.helper.IOHelper;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.UUID;
+
+public final class RequestTextureProvider extends TextureProvider {
+    // Instance
+    private String skinURL;
+    private String cloakURL;
+
+    @SuppressWarnings("unused")
+    public RequestTextureProvider() {
+    }
+
+    public RequestTextureProvider(String skinURL, String cloakURL) {
+        this.skinURL = skinURL;
+        this.cloakURL = cloakURL;
+    }
+
+    private static Texture getTexture(String url, boolean cloak) throws IOException {
+        try {
+            return new Texture(url, cloak);
+        } catch (FileNotFoundException ignored) {
+            return null; // Simply not found
+        }
+    }
+
+    private static String getTextureURL(String url, UUID uuid, String username, String client) {
+        return CommonHelper.replace(url, "username", IOHelper.urlEncode(username),
+                "uuid", IOHelper.urlEncode(uuid.toString()), "hash", IOHelper.urlEncode(Launcher.toHash(uuid)),
+                "client", IOHelper.urlEncode(client == null ? "unknown" : client));
+    }
+
+    @Override
+    public void close() {
+        // Do nothing
+    }
+
+    @Override
+    public Texture getCloakTexture(UUID uuid, String username, String client) throws IOException {
+        return getTexture(getTextureURL(cloakURL, uuid, username, client), true);
+    }
+
+    @Override
+    public Texture getSkinTexture(UUID uuid, String username, String client) throws IOException {
+        return getTexture(getTextureURL(skinURL, uuid, username, client), false);
+    }
+}

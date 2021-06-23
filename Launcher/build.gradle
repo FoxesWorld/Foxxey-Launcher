@@ -1,8 +1,8 @@
 apply plugin: 'org.openjfx.javafxplugin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-String mainClassName = "pro.gravit.launcher.ClientLauncherWrapper"
-String mainAgentName = "pro.gravit.launcher.LauncherAgent"
+String mainClassName = "org.foxesworld.launcher.ClientLauncherWrapper"
+String mainAgentName = "org.foxesworld.launcher.LauncherAgent"
 
 repositories {
     maven {
@@ -42,8 +42,8 @@ task javadocJar(type: Jar) {
 shadowJar {
     duplicatesStrategy = 'EXCLUDE'
     classifier = null
-    relocate 'org.objectweb.asm', 'pro.gravit.repackage.org.objectweb.asm'
-    relocate 'io.netty', 'pro.gravit.repackage.io.netty'
+    relocate 'org.objectweb.asm', 'org.foxesworld.repackage.org.objectweb.asm'
+    relocate 'io.netty', 'org.foxesworld.repackage.io.netty'
     configurations = [project.configurations.pack]
     exclude 'module-info.class'
 }
@@ -70,49 +70,3 @@ task dumpLibs(type: Copy) {
 
 
 assemble.dependsOn tasks.genRuntimeJS, tasks.dumpLibs, tasks.shadowJar
-
-publishing {
-    publications {
-        launcherclientapi(MavenPublication) {
-            artifactId = 'launcher-client-api'
-            artifact(jar) {
-                classifier ""
-            }
-            artifact sourcesJar
-            artifact javadocJar
-            pom {
-                name = 'GravitLauncher Client API'
-                description = 'GravitLauncher Client Module API'
-                url = 'https://launcher.gravit.pro'
-                licenses {
-                    license {
-                        name = 'GNU General Public License, Version 3.0'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.html'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'gravita'
-                        name = 'Gravita'
-                        email = 'gravita@gravit.pro'
-                    }
-                    developer {
-                        id = 'zaxar163'
-                        name = 'Zaxar163'
-                        email = 'zahar.vcherachny@yandex.ru'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/GravitLauncher/Launcher.git'
-                    developerConnection = 'scm:git:ssh://git@github.com:GravitLauncher/Launcher.git'
-                    url = 'https://launcher.gravit.pro/'
-                }
-            }
-        }
-    }
-}
-
-
-signing {
-    sign publishing.publications.launcherclientapi
-}

@@ -1,0 +1,40 @@
+package org.foxesworld.launchserver.socket.handlers;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.foxesworld.launchserver.LaunchServer;
+import org.foxesworld.launchserver.config.LaunchServerConfig;
+import org.foxesworld.launchserver.socket.LauncherNettyServer;
+
+import javax.net.ssl.SSLServerSocketFactory;
+import java.net.InetSocketAddress;
+
+@SuppressWarnings("unused")
+public final class NettyServerSocketHandler implements Runnable, AutoCloseable {
+    private transient final LaunchServer server;
+    private transient final Logger logger = LogManager.getLogger();
+    @Deprecated
+    public volatile boolean logConnections = Boolean.getBoolean("launcher.logConnections");
+    public LauncherNettyServer nettyServer;
+    private SSLServerSocketFactory ssf;
+
+    public NettyServerSocketHandler(LaunchServer server) {
+        this.server = server;
+    }
+
+    @Override
+    public void close() {
+        if (nettyServer == null) return;
+        nettyServer.close();
+        nettyServer.service.channels.close();
+    }
+
+    @Override
+    public void run() {
+        logger.info("Starting netty server socket thread");
+        nettyServer = new LauncherNettyServer(server);
+        for (LaunchServerConfig.NettyBindAddress address : server.config.netty.binds) {
+            nettyServer.bind(new InetSocketAddress(address.address, address.port));
+        }
+    }
+}

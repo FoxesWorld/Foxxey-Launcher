@@ -4,7 +4,7 @@ plugins {
     id 'signing'
     id 'org.openjfx.javafxplugin' version '0.0.8' apply false
 }
-group = 'pro.gravit.launcher'
+group = 'org.foxesworld.launcher'
 version = '5.2.0-SNAPSHOT'
 
 apply from: 'props.gradle'
@@ -16,7 +16,7 @@ configure(subprojects.findAll { it.name != 'modules' }) {
     apply plugin: 'java-library'
 
 
-    group = 'pro.gravit'
+    group = 'org.foxesworld'
 
     repositories {
         mavenCentral()

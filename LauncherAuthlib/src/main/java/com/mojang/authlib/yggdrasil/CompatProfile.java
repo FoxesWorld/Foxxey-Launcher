@@ -1,8 +1,8 @@
 package com.mojang.authlib.yggdrasil;
 
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.profiles.PlayerProfile;
-import pro.gravit.utils.helper.SecurityHelper;
+import org.foxesworld.launcher.Launcher;
+import org.foxesworld.launcher.profiles.PlayerProfile;
+import org.foxesworld.utils.helper.SecurityHelper;
 
 import java.util.UUID;
 

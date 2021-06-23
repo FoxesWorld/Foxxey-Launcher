@@ -1,10 +1,10 @@
 package com.mojang.authlib.yggdrasil;
 
-import pro.gravit.launcher.request.auth.CheckServerRequest;
-import pro.gravit.launcher.request.auth.JoinServerRequest;
-import pro.gravit.utils.helper.CommonHelper;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
+import org.foxesworld.launcher.request.auth.CheckServerRequest;
+import org.foxesworld.launcher.request.auth.JoinServerRequest;
+import org.foxesworld.utils.helper.CommonHelper;
+import org.foxesworld.utils.helper.IOHelper;
+import org.foxesworld.utils.helper.LogHelper;
 
 // Used by 1.6.4 and below versions
 

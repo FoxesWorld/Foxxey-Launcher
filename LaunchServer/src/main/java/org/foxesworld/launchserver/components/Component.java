@@ -1,0 +1,37 @@
+package org.foxesworld.launchserver.components;
+
+import org.foxesworld.launchserver.LaunchServer;
+import org.foxesworld.utils.ProviderMap;
+
+public abstract class Component {
+    public static final ProviderMap<Component> providers = new ProviderMap<>();
+    private static boolean registredComp = false;
+    protected String componentName;
+
+    public static void registerComponents() {
+        if (!registredComp) {
+            providers.register("authLimiter", AuthLimiterComponent.class);
+            providers.register("regLimiter", RegLimiterComponent.class);
+            providers.register("commandRemover", CommandRemoverComponent.class);
+            providers.register("proguard", ProGuardComponent.class);
+            providers.register("whitelist", WhitelistComponent.class);
+            registredComp = true;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void preInit(LaunchServer launchServer) {
+
+    }
+
+    public abstract void init(LaunchServer launchServer);
+
+    public final void setComponentName(String s) {
+        this.componentName = s;
+    }
+
+    @SuppressWarnings("unused")
+    public void postInit(LaunchServer launchServer) {
+
+    }
+}

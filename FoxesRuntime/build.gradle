@@ -8,9 +8,9 @@ plugins {
 apply plugin: 'org.openjfx.javafxplugin'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
-group 'pro.gravit.launcher'
+group 'org.foxesworld.launcher'
 version '2.0.0'
-def mainClassName = "pro.gravit.launcher.client.JavaRuntimeModule"
+def mainClassName = "org.foxesworld.launcher.client.JavaRuntimeModule"
 
 javafx {
     version = "12"
@@ -40,7 +40,7 @@ tasks.withType(JavaCompile) {
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
-            "Module-Config-Class": "pro.gravit.launcher.client.gui.config.GuiModuleConfig",
+            "Module-Config-Class": "org.foxesworld.launcher.client.gui.config.GuiModuleConfig",
             "Module-Config-Name": "JavaRuntime")
 }
 
@@ -50,7 +50,7 @@ task runDev(type: JavaExec) {
     description = "Run the main class with JavaExecTask"
     classpath = sourceSets.main.runtimeClasspath
     jvmArgs = ["-Dlauncherdebug.modules="+mainClassName, "-Dlauncherdebug.env=DEBUG"]
-    main = "pro.gravit.launcher.debug.DebugMain"
+    main = "org.foxesworld.launcher.debug.DebugMain"
 }
 
 repositories {

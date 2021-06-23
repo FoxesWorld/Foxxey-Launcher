@@ -1,12 +1,12 @@
 package com.mojang.authlib.yggdrasil;
 
-import pro.gravit.launcher.profiles.PlayerProfile;
-import pro.gravit.launcher.request.auth.CheckServerRequest;
-import pro.gravit.launcher.request.auth.JoinServerRequest;
-import pro.gravit.launcher.request.uuid.BatchProfileByUsernameRequest;
-import pro.gravit.launcher.request.uuid.ProfileByUUIDRequest;
-import pro.gravit.launcher.request.uuid.ProfileByUsernameRequest;
-import pro.gravit.utils.helper.LogHelper;
+import org.foxesworld.launcher.profiles.PlayerProfile;
+import org.foxesworld.launcher.request.auth.CheckServerRequest;
+import org.foxesworld.launcher.request.auth.JoinServerRequest;
+import org.foxesworld.launcher.request.uuid.BatchProfileByUsernameRequest;
+import org.foxesworld.launcher.request.uuid.ProfileByUUIDRequest;
+import org.foxesworld.launcher.request.uuid.ProfileByUsernameRequest;
+import org.foxesworld.utils.helper.LogHelper;
 
 import java.util.UUID;
 

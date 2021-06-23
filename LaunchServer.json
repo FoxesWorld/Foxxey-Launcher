@@ -1,8 +1,7 @@
 {
   "projectName": "FoxesWorld",
   "mirrors": [
-    "https://mirror.gravit.pro/",
-    "https://gravit-launcher-mirror.storage.googleapis.com/"
+    "https://mirror.foxesword.ru/"
   ],
   "binaryName": "Launcher",
   "copyBinaries": true,
