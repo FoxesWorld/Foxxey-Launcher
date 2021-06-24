@@ -48,21 +48,23 @@ public final class VkNewsProvider extends NewsProvider {
         vkApiClient = new VkApiClient(transportClient);
         groupActor = new GroupActor(groupId, accessToken);
         serviceActor = new ServiceActor(appId, serviceToken);
-        executorService.execute(() -> {
-            try {
-                new CallbackApiLongPoll(vkApiClient, groupActor) {
-
-                    @Override
-                    public void wallPostNew(Integer groupId, Wallpost wallpost) {
-                        processWallpost(wallpost);
-                        logger.info("Posted news fetched");
-                    }
-                }.run();
-            } catch (ClientException | ApiException e) {
-                e.printStackTrace();
-            }
-        });
+        executorService.execute(this::startCallbackApiLongPoll);
         executorService.execute(this::fetchNews);
+    }
+
+    private void startCallbackApiLongPoll() {
+        try {
+            new CallbackApiLongPoll(vkApiClient, groupActor) {
+
+                @Override
+                public void wallPostNew(Integer groupId, Wallpost wallpost) {
+                    processWallpost(wallpost);
+                    logger.info("Posted news fetched");
+                }
+            }.run();
+        } catch (ClientException | ApiException e) {
+            startCallbackApiLongPoll();
+        }
     }
 
     public void fetchNews() {
