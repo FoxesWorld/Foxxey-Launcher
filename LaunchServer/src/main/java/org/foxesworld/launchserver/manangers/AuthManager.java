@@ -6,7 +6,6 @@ import org.foxesworld.launcher.ClientPermissions;
 import org.foxesworld.launcher.events.request.AuthRequestEvent;
 import org.foxesworld.launcher.profiles.ClientProfile;
 import org.foxesworld.launcher.profiles.PlayerProfile;
-import org.foxesworld.launcher.profiles.Texture;
 import org.foxesworld.launcher.request.auth.AuthRequest;
 import org.foxesworld.launcher.request.auth.password.*;
 import org.foxesworld.launchserver.LaunchServer;
@@ -331,23 +330,10 @@ public class AuthManager {
 
     private PlayerProfile getPlayerProfile(UUID uuid, String username, String client, TextureProvider textureProvider) {
         // Get skin texture
-        Texture skin;
-        try {
-            skin = textureProvider.getSkinTexture(uuid, username, client);
-        } catch (IOException e) {
-            skin = null;
-        }
-
-        // Get cloak texture
-        Texture cloak;
-        try {
-            cloak = textureProvider.getCloakTexture(uuid, username, client);
-        } catch (IOException e) {
-            cloak = null;
-        }
+        TextureProvider.SkinAndCloakTextures textures = textureProvider.getTextures(uuid, username, client);
 
         // Return combined profile
-        return new PlayerProfile(uuid, username, skin, cloak);
+        return new PlayerProfile(uuid, username, textures.skin, textures.cloak);
     }
 
     public AuthRequest.AuthPasswordInterface decryptPassword(AuthRequest.AuthPasswordInterface password) throws AuthException {

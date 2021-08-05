@@ -1,6 +1,8 @@
 package org.foxesworld.launcher;
 
+import org.foxesworld.launcher.api.DialogService;
 import org.foxesworld.launcher.events.ExtendedTokenRequestEvent;
+import org.foxesworld.launcher.events.NotificationEvent;
 import org.foxesworld.launcher.events.request.SecurityReportRequestEvent;
 import org.foxesworld.launcher.request.Request;
 import org.foxesworld.launcher.request.WebSocketEvent;
@@ -21,6 +23,11 @@ public class BasicLauncherEventHandler implements ClientWebSocketService.EventHa
             String token = event1.getExtendedToken();
             if (token != null) {
                 Request.addExtendedToken(event1.getExtendedTokenName(), token);
+            }
+        } else if (event instanceof NotificationEvent) {
+            NotificationEvent n = (NotificationEvent) event;
+            if (DialogService.isNotificationsAvailable()) {
+                DialogService.createNotification(n.icon, n.head, n.message);
             }
         }
         return false;

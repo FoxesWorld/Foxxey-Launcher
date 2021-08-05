@@ -4,6 +4,8 @@ import org.foxesworld.launcher.client.*;
 import org.foxesworld.launcher.client.events.ClientEngineInitPhase;
 import org.foxesworld.launcher.client.events.ClientExitPhase;
 import org.foxesworld.launcher.client.events.ClientPreGuiPhase;
+import org.foxesworld.launcher.console.GetPublicKeyCommand;
+import org.foxesworld.launcher.console.SignDataCommand;
 import org.foxesworld.launcher.guard.LauncherGuardInterface;
 import org.foxesworld.launcher.guard.LauncherGuardManager;
 import org.foxesworld.launcher.guard.LauncherNoGuard;
@@ -131,6 +133,14 @@ public class LauncherEngine {
             throw new SecurityException("JavaAgent found");
     }
 
+    public ECPublicKey getClientPublicKey() {
+        return publicKey;
+    }
+
+    public byte[] sign(byte[] bytes) {
+        return SecurityHelper.sign(bytes, privateKey);
+    }
+
     public static LauncherGuardInterface tryGetStdGuard() {
         switch (Launcher.getConfig().guardType) {
             case "no":
@@ -200,10 +210,16 @@ public class LauncherEngine {
         if (started.getAndSet(true))
             throw new IllegalStateException("Launcher has been already started");
         readKeys();
+        registerCommands();
         LauncherEngine.modulesManager.invokeEvent(new ClientEngineInitPhase(this));
         runtimeProvider.preLoad();
         LauncherGuardManager.initGuard(clientInstance);
         LogHelper.debug("Dir: %s", DirBridge.dir);
         runtimeProvider.run(args);
+    }
+
+    private void registerCommands() {
+        ConsoleManager.handler.registerCommand("getpublickey", new GetPublicKeyCommand(this));
+        ConsoleManager.handler.registerCommand("signdata", new SignDataCommand(this));
     }
 }

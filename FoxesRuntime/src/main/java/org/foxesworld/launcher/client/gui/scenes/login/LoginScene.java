@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -116,13 +115,14 @@ public class LoginScene extends AbstractScene {
                     if (result.needUpdate) {
                         try {
                             LogHelper.debug("Start update processing");
+                            disable();
                             application.securityService.update(result);
                             LogHelper.debug("Exit with Platform.exit");
                             Platform.exit();
                             return;
                         } catch (Throwable e) {
                             contextHelper.runInFxThread(() -> {
-                                getCurrentOverlay().errorHandle(e);
+                                errorHandle(e);
                             });
                             try {
                                 Thread.sleep(1500);

@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.foxesworld.launcher.*;
+import org.foxesworld.launcher.api.DialogService;
 import org.foxesworld.launcher.client.*;
 import org.foxesworld.launcher.client.events.ClientExitPhase;
 import org.foxesworld.launcher.client.events.ClientGuiPhase;
@@ -16,6 +17,7 @@ import org.foxesworld.launcher.client.gui.config.StdSettingsManager;
 import org.foxesworld.launcher.client.gui.helper.EnFSHelper;
 import org.foxesworld.launcher.client.gui.impl.*;
 import org.foxesworld.launcher.client.gui.scenes.AbstractScene;
+import org.foxesworld.launcher.client.gui.service.RuntimeDialogService;
 import org.foxesworld.launcher.client.gui.service.StateService;
 import org.foxesworld.launcher.client.gui.stage.PrimaryStage;
 import org.foxesworld.launcher.client.gui.utils.FXMLFactory;
@@ -129,6 +131,9 @@ public class JavaFXApplication extends Application {
             if(runtimeDirectory == null) {
                 enfsDirectory = EnFSHelper.initEnFS(config);
             }
+            if(!EnFSHelper.checkEnFSUrl()) {
+                JavaRuntimeModule.noEnFSAlert();
+            }
         } catch (Throwable e) {
             if(!(e instanceof ClassNotFoundException)) {
                 LogHelper.error(e);
@@ -139,10 +144,18 @@ public class JavaFXApplication extends Application {
             runtimeSettings.locale = RuntimeSettings.DEFAULT_LOCALE;
         try {
             updateLocaleResources(runtimeSettings.locale.name);
-        } catch (FileNotFoundException e)
+        } catch (Throwable e)
         {
             JavaRuntimeModule.noLocaleAlert(runtimeSettings.locale.name);
+            if(!(e instanceof  FileNotFoundException)) {
+                LogHelper.error(e);
+            }
             Platform.exit();
+        }
+        {
+            RuntimeDialogService dialogService = new RuntimeDialogService(messageManager);
+            DialogService.setDialogImpl(dialogService);
+            DialogService.setNotificationImpl(dialogService);
         }
         try {
             mainStage = new PrimaryStage(stage, String.format("%s Launcher", config.projectName));
@@ -179,10 +192,14 @@ public class JavaFXApplication extends Application {
     private void registerCommands() {
         runtimeCategory = new BaseCommandCategory();
         runtimeCategory.registerCommand("version", new VersionCommand());
+        if(ConsoleManager.isConsoleUnlock) {
+            registerPrivateCommands();
+        }
         ConsoleManager.handler.registerCategory(new CommandHandler.Category(runtimeCategory, "runtime"));
     }
 
     public void registerPrivateCommands() {
+        if(runtimeCategory == null) return;
         runtimeCategory.registerCommand("runtime", new RuntimeCommand(this));
     }
 
@@ -214,8 +231,7 @@ public class JavaFXApplication extends Application {
     }
 
     private static URL getResourceEnFs(String name) throws IOException {
-        return EnFSHelper.getURL(enfsDirectory.resolve(name).toString());
-        //return EnFS.main.getURL(enfsDirectory.resolve(name));
+        return EnFSHelper.getURL(enfsDirectory.resolve(name).toString().replaceAll("\\\\", "/"));
     }
 
     public URL tryResource(String name) {

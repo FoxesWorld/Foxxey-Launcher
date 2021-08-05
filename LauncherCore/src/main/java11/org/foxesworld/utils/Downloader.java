@@ -191,6 +191,7 @@ public class Downloader {
         private final HttpResponse.BodyHandler<T> delegate;
         private final DownloadCallback callback;
         private ProgressTrackingBodySubscriber subscriber;
+        private boolean isCanceled = false;
 
         public ProgressTrackingBodyHandler(HttpResponse.BodyHandler<T> delegate, DownloadCallback callback) {
             this.delegate = delegate;
@@ -200,10 +201,14 @@ public class Downloader {
         @Override
         public HttpResponse.BodySubscriber<T> apply(HttpResponse.ResponseInfo responseInfo) {
             subscriber = new ProgressTrackingBodySubscriber(delegate.apply(responseInfo));
+            if (isCanceled) {
+                subscriber.cancel();
+            }
             return subscriber;
         }
 
         public void cancel() {
+            isCanceled = true;
             if (subscriber != null) {
                 subscriber.cancel();
             }
@@ -212,6 +217,7 @@ public class Downloader {
         private class ProgressTrackingBodySubscriber implements HttpResponse.BodySubscriber<T> {
             private final HttpResponse.BodySubscriber<T> delegate;
             private Flow.Subscription subscription;
+            private boolean isCanceled = false;
 
             public ProgressTrackingBodySubscriber(HttpResponse.BodySubscriber<T> delegate) {
                 this.delegate = delegate;
@@ -225,6 +231,9 @@ public class Downloader {
             @Override
             public void onSubscribe(Flow.Subscription subscription) {
                 this.subscription = subscription;
+                if (isCanceled) {
+                    subscription.cancel();
+                }
                 delegate.onSubscribe(subscription);
             }
 
@@ -249,6 +258,7 @@ public class Downloader {
             }
 
             public void cancel() {
+                isCanceled = true;
                 if (subscription != null) {
                     subscription.cancel();
                 }

@@ -367,7 +367,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
             modulesManager.invokeEvent(new LaunchServerFullInitEvent(this));
             logger.info("LaunchServer started");
         } catch (Throwable e) {
-            logger.error("LaunchServer startup failed",e);
+            logger.error("LaunchServer startup failed", e);
             JVMHelper.RUNTIME.exit(-1);
         }
     }
@@ -393,6 +393,18 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
     public void syncProfiles() throws IOException {
         logger.info("Syncing profiles");
         profilesList = Set.copyOf(config.clientProfileProvider.getAll());
+        if (pingServerManager != null)
+            pingServerManager.syncServers();
+    }
+
+    public void syncProfilesDir() throws IOException {
+        logger.info("Syncing profiles dir");
+        List<ClientProfile> newProfies = new LinkedList<>();
+        IOHelper.walk(profilesDir, new ProfilesFileVisitor(newProfies), false);
+
+        // Sort and set new profiles
+        newProfies.sort(Comparator.comparing(a -> a));
+        profilesList = Set.copyOf(newProfies);
         if (pingServerManager != null)
             pingServerManager.syncServers();
     }

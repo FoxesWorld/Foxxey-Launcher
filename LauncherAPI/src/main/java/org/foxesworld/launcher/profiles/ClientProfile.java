@@ -559,7 +559,8 @@ public final class ClientProfile implements Comparable<ClientProfile> {
     MC1163("1.16.3", 753),
     MC1164("1.16.4", 754),
     MC1165("1.16.5", 754),
-    MC117("1.17", 755);
+    MC117("1.17", 755),
+    MC1171("1.17.1", 756);
     private static final Map<String, Version> VERSIONS;
 
     static {
@@ -594,7 +595,7 @@ public final class ClientProfile implements Comparable<ClientProfile> {
   }
 
   public enum ClassLoaderConfig {
-    AGENT, LAUNCHER
+    AGENT, LAUNCHER, SYSTEM_ARGS
   }
 
   public enum SignedClientConfig {

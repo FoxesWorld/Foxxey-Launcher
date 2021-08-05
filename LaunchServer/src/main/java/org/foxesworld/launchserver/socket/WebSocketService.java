@@ -14,7 +14,6 @@ import org.foxesworld.launcher.events.ExceptionEvent;
 import org.foxesworld.launcher.events.RequestEvent;
 import org.foxesworld.launcher.events.request.ErrorRequestEvent;
 import org.foxesworld.launcher.events.request.ExitRequestEvent;
-import org.foxesworld.launcher.events.request.GetNewsEvent;
 import org.foxesworld.launcher.request.WebSocketEvent;
 import org.foxesworld.launchserver.LaunchServer;
 import org.foxesworld.launchserver.dao.User;
@@ -96,6 +95,7 @@ public class WebSocketService {
         providers.register("features", FeaturesResponse.class);
         providers.register("refreshToken", RefreshTokenResponse.class);
         providers.register("restore", RestoreResponse.class);
+        providers.register("additionalData", AdditionalDataResponse.class);
     }
 
     public void forEachActiveChannels(BiConsumer<Channel, WebSocketFrameHandler> callback) {

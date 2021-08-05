@@ -125,6 +125,7 @@ public class UpdateScene extends AbstractScene {
                 lastUpdateTime.set(System.currentTimeMillis());
                 lastDownloaded.set(0);
                 totalSize = 0;
+                progressBar.progressProperty().setValue(0);
                 if (optionalsEnabled) {
                     for(OptionalAction action : view.getDisabledActions())
                     {
@@ -170,6 +171,7 @@ public class UpdateScene extends AbstractScene {
                                         LogHelper.dev("Remap found: injected url path: %s | calculated original url path: %s", path, urlPath);
                                     }
                                 }
+                                Files.deleteIfExists(dir.resolve(path));
                                 adds.add(new AsyncDownloader.SizedFile(urlPath, path, file.size));
                                 break;
                             case DIR:
@@ -180,7 +182,7 @@ public class UpdateScene extends AbstractScene {
                     });
                     LogHelper.info("Diff %d %d", diff.mismatch.size(), diff.extra.size());
                     ContextHelper.runInFxThreadStatic(() -> addLog(String.format("Downloading %s...", dirName)));
-                    Downloader downloader = Downloader.downloadList(adds, updateRequestEvent.url, dir, new Downloader.DownloadCallback() {
+                    downloader = Downloader.downloadList(adds, updateRequestEvent.url, dir, new Downloader.DownloadCallback() {
                         @Override
                         public void apply(long fullDiff) {
                             {
@@ -193,7 +195,7 @@ public class UpdateScene extends AbstractScene {
                         public void onComplete(Path path) {
 
                         }
-                    }, application.workers, 4);
+                    }, null, 4);
                     downloader.getFuture().thenAccept((e) -> {
                         ContextHelper.runInFxThreadStatic(() -> addLog(String.format("Delete Extra files %s", dirName)));
                         try {
@@ -251,8 +253,8 @@ public class UpdateScene extends AbstractScene {
         logOutput.clear();
         volume.setText("");
         speed.setText("0");
-       reload.setDisable(true);
-        reload.setStyle("-fx-opacity: 0");
+       //reload.setDisable(true);
+        //reload.setStyle("-fx-opacity: 0");
         cancel.setDisable(false);
         cancel.setStyle("-fx-opacity: 1");
         progressBar.getStyleClass().removeAll("progress");
@@ -270,8 +272,8 @@ public class UpdateScene extends AbstractScene {
         speedtext.setStyle("-fx-opacity: 0");
         speederr.setStyle("-fx-opacity: 1");
         LogHelper.error(e);
-        reload.setDisable(false);
-        reload.setStyle("-fx-opacity: 1");
+        //reload.setDisable(false);
+        //reload.setStyle("-fx-opacity: 1");
         cancel.setDisable(true);
         cancel.setStyle("-fx-opacity: 0");
     }

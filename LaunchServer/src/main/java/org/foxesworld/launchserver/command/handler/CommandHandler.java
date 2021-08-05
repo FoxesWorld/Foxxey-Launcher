@@ -32,7 +32,6 @@ public abstract class CommandHandler extends org.foxesworld.utils.command.Comman
         basic.registerCommand("gc", new GCCommand());
         basic.registerCommand("loadModule", new LoadModuleCommand(server));
         basic.registerCommand("modules", new ModulesCommand(server));
-        basic.registerCommand("test", new TestCommand(server));
         Category basicCategory = new Category(basic, "basic", "Base LaunchServer commands");
         handler.registerCategory(basicCategory);
 
@@ -48,6 +47,7 @@ public abstract class CommandHandler extends org.foxesworld.utils.command.Comman
         updates.registerCommand("syncUP", new SyncUPCommand(server));
         updates.registerCommand("saveProfiles", new SaveProfilesCommand(server));
         updates.registerCommand("syncNews", new SyncNewsCommand(server));
+        updates.registerCommand("makeProfile", new MakeProfileCommand(server));
         Category updatesCategory = new Category(updates, "updates", "Update and Sync Management");
         handler.registerCategory(updatesCategory);
 

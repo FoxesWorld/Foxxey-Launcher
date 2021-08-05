@@ -7,6 +7,7 @@ import org.foxesworld.launcher.Launcher;
 import org.foxesworld.launcher.profiles.ClientProfile;
 import org.foxesworld.launchserver.LaunchServer;
 import org.foxesworld.launchserver.command.Command;
+import org.foxesworld.launchserver.helper.MakeProfileHelper;
 import org.foxesworld.utils.command.CommandException;
 import org.foxesworld.utils.helper.IOHelper;
 
@@ -60,18 +61,24 @@ public final class DownloadClientCommand extends Command {
         // Create profile file
         logger.info("Creaing profile file: '{}'", dirName);
         ClientProfile client = null;
-        try {
-            String internalVersion = versionName;
-            if (internalVersion.contains("-")) {
-                internalVersion = internalVersion.substring(0, versionName.indexOf('-'));
+        if (!isMirrorClientDownload) {
+            try {
+                String internalVersion = versionName;
+                if (internalVersion.contains("-")) {
+                    internalVersion = internalVersion.substring(0, versionName.indexOf('-'));
+                }
+                ClientProfile.Version version = ClientProfile.Version.byName(internalVersion);
+                if (version.compareTo(ClientProfile.Version.MC164) <= 0) {
+                    logger.warn("Minecraft 1.6.4 and below not supported. Use at your own risk");
+                }
+                MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientDir, version);
+                for (MakeProfileHelper.MakeProfileOption option : options) {
+                    logger.debug("Detected option {}", option.getClass().getSimpleName());
+                }
+                client = MakeProfileHelper.makeProfile(version, dirName, options);
+            } catch (Throwable e) {
+                isMirrorClientDownload = true;
             }
-            ClientProfile.Version version = ClientProfile.Version.byName(internalVersion);
-            if (version.compareTo(ClientProfile.Version.MC164) <= 0) {
-                logger.warn("Minecraft 1.6.4 and below not supported. Use at your own risk");
-            }
-            client = SaveProfilesCommand.makeProfile(version, dirName, SaveProfilesCommand.getMakeProfileOptionsFromDir(clientDir, version));
-        } catch (Throwable e) {
-            isMirrorClientDownload = true;
         }
         if (isMirrorClientDownload) {
             JsonElement clientJson = server.mirrorManager.jsonRequest(null, "GET", "clients/%s.json", versionName);
