@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Properties;
 
 public class JavaHelper {
+    private static List<JavaVersion> javaVersionsCache;
+
     public static Path tryGetOpenJFXPath(Path jvmDir) {
         String dirName = jvmDir.getFileName().toString();
         Path parent = jvmDir.getParent();
@@ -54,7 +56,10 @@ public class JavaHelper {
         return false;
     }
 
-    public static List<JavaVersion> findJava() {
+    public synchronized static List<JavaVersion> findJava() {
+        if(javaVersionsCache != null) {
+            return javaVersionsCache;
+        }
         List<String> javaPaths = new ArrayList<>(4);
         List<JavaVersion> result = new ArrayList<>(4);
         try {
@@ -82,6 +87,8 @@ public class JavaHelper {
             try {
                 trySearchJava(javaPaths, result, rootDrive.resolve("Program Files").resolve("Java"));
                 trySearchJava(javaPaths, result, rootDrive.resolve("Program Files").resolve("AdoptOpenJDK"));
+                trySearchJava(javaPaths, result, rootDrive.resolve("Program Files").resolve("Eclipse Foundation")); //AdoptJDK rebranding
+                trySearchJava(javaPaths, result, rootDrive.resolve("Program Files").resolve("BellSoft")); // LibericaJDK
             } catch (IOException e) {
                 LogHelper.error(e);
             }
@@ -92,7 +99,20 @@ public class JavaHelper {
                 LogHelper.error(e);
             }
         }
+        javaVersionsCache = result;
         return result;
+    }
+
+    private static JavaVersion tryFindJavaByPath(Path path) {
+        if(javaVersionsCache == null) {
+            return null;
+        }
+        for(JavaVersion version : javaVersionsCache) {
+            if(version.jvmDir.equals(path)) {
+                return version;
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -186,6 +206,12 @@ public class JavaHelper {
         }
 
         public static JavaVersion getByPath(Path jvmDir) throws IOException {
+            {
+                JavaVersion version = JavaHelper.tryFindJavaByPath(jvmDir);
+                if(version != null) {
+                    return version;
+                }
+            }
             Path releaseFile = jvmDir.resolve("release");
             JavaVersionAndBuild versionAndBuild;
             if (IOHelper.isFile(releaseFile)) {
