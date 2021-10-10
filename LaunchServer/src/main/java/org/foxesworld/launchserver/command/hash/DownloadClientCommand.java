@@ -59,7 +59,7 @@ public final class DownloadClientCommand extends Command {
         server.mirrorManager.downloadZip(clientDir, "clients/%s.zip", versionName);
 
         // Create profile file
-        logger.info("Creaing profile file: '{}'", dirName);
+        logger.info("Creating profile file: '{}'", dirName);
         ClientProfile client = null;
         if (!isMirrorClientDownload) {
             try {

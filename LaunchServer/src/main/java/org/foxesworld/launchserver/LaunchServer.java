@@ -163,7 +163,6 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
         updatesManager = new UpdatesManager(this);
         RestoreResponse.registerProviders(this);
         //Generate or set new Certificate API
-        certificateManager.orgName = config.projectName;
         config.init(ReloadType.FULL);
         registerObject("launchServer", this);
         GarbageManager.registerNeedGC(sessionManager);
@@ -491,7 +490,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
     }
 
     public static class LaunchServerDirectories {
-        public static final String UPDATES_NAME = "updates", PROFILES_NAME = "profiles",
+        public static final String UPDATES_NAME = "clients", PROFILES_NAME = "profiles",
                 TRUSTSTORE_NAME = "truststore", LAUNCHERLIBRARIES_NAME = "launcher-libraries",
                 LAUNCHERLIBRARIESCOMPILE_NAME = "launcher-libraries-compile", KEY_NAME = ".keys";
         public Path updatesDir;
