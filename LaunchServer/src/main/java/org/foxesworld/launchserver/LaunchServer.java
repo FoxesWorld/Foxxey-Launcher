@@ -490,7 +490,7 @@ public final class LaunchServer implements Runnable, AutoCloseable, Reconfigurab
     }
 
     public static class LaunchServerDirectories {
-        public static final String UPDATES_NAME = "clients", PROFILES_NAME = "profiles",
+        public static final String UPDATES_NAME = "clients", PROFILES_NAME = "modpacks",
                 TRUSTSTORE_NAME = "truststore", LAUNCHERLIBRARIES_NAME = "launcher-libraries",
                 LAUNCHERLIBRARIESCOMPILE_NAME = "launcher-libraries-compile", KEY_NAME = ".keys";
         public Path updatesDir;
