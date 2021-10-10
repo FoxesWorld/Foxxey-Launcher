@@ -3,8 +3,6 @@ package org.foxesworld.launchserver.auth;
 import org.foxesworld.launchserver.LaunchServer;
 import org.foxesworld.launchserver.auth.core.AuthCoreProvider;
 import org.foxesworld.launchserver.auth.core.AuthSocialProvider;
-import org.foxesworld.launchserver.auth.handler.AuthHandler;
-import org.foxesworld.launchserver.auth.provider.AuthProvider;
 import org.foxesworld.launchserver.auth.texture.TextureProvider;
 
 import java.io.IOException;
@@ -14,8 +12,6 @@ import java.util.Set;
 
 public final class AuthProviderPair {
     public boolean isDefault = true;
-    public AuthProvider provider;
-    public AuthHandler handler;
     public TextureProvider textureProvider;
     public AuthCoreProvider core;
     public AuthSocialProvider social;
@@ -37,12 +33,6 @@ public final class AuthProviderPair {
     public AuthProviderPair(AuthCoreProvider core, AuthSocialProvider social, TextureProvider textureProvider) {
         this.core = core;
         this.social = social;
-        this.textureProvider = textureProvider;
-    }
-
-    public AuthProviderPair(AuthProvider provider, AuthHandler handler, TextureProvider textureProvider) {
-        this.provider = provider;
-        this.handler = handler;
         this.textureProvider = textureProvider;
     }
 
@@ -82,23 +72,12 @@ public final class AuthProviderPair {
     public final void init(LaunchServer srv, String name) {
         this.name = name;
         if (links != null) link(srv);
-        if (core == null) {
-            if (provider == null) throw new NullPointerException(String.format("Auth %s provider null", name));
-            if (handler == null) throw new NullPointerException(String.format("Auth %s handler null", name));
-            if (social != null)
-                throw new IllegalArgumentException(String.format("Auth %s social can't be used in provider/handler method", name));
-            provider.init(srv);
-            handler.init(srv);
-        } else {
-            if (provider != null) throw new IllegalArgumentException(String.format("Auth %s provider not null", name));
-            if (handler != null) throw new IllegalArgumentException(String.format("Auth %s handler not null", name));
-            core.init(srv);
-            features = new HashSet<>();
-            getFeatures(core.getClass(), features);
-            if (social != null) {
-                social.init(srv, core);
-                getFeatures(social.getClass(), features);
-            }
+        core.init(srv);
+        features = new HashSet<>();
+        getFeatures(core.getClass(), features);
+        if (social != null) {
+            social.init(srv, core);
+            getFeatures(social.getClass(), features);
         }
     }
 
@@ -108,19 +87,7 @@ public final class AuthProviderPair {
             if (pair == null) {
                 throw new NullPointerException(String.format("Auth %s link failed. Pair %s not found", name, v));
             }
-            if ("provider".equals(k)) {
-                if (pair.provider == null)
-                    throw new NullPointerException(String.format("Auth %s link failed. %s.provider is null", name, v));
-                provider = pair.provider;
-            } else if ("handler".equals(k)) {
-                if (pair.handler == null)
-                    throw new NullPointerException(String.format("Auth %s link failed. %s.handler is null", name, v));
-                handler = pair.handler;
-            } else if ("textureProvider".equals(k)) {
-                if (pair.textureProvider == null)
-                    throw new NullPointerException(String.format("Auth %s link failed. %s.textureProvider is null", name, v));
-                textureProvider = pair.textureProvider;
-            } else if ("core".equals(k)) {
+            if ("core".equals(k)) {
                 if (pair.core == null)
                     throw new NullPointerException(String.format("Auth %s link failed. %s.core is null", name, v));
                 core = pair.core;
@@ -132,27 +99,13 @@ public final class AuthProviderPair {
         if (social != null) {
             social.close();
         }
-        if (core == null) {
-            provider.close();
-            handler.close();
-        } else {
-            core.close();
-        }
+        core.close();
         if (textureProvider != null) {
             textureProvider.close();
         }
     }
 
-    public final boolean isUseCore() {
-        return core != null;
-    }
-
     public final boolean isUseSocial() {
         return core != null && social != null;
-    }
-
-    @SuppressWarnings("unused")
-    public final boolean isUseProviderAndHandler() {
-        return !isUseCore();
     }
 }

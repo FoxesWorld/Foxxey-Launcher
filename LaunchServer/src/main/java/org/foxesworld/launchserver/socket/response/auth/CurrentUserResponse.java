@@ -5,24 +5,8 @@ import org.foxesworld.launcher.events.request.CurrentUserRequestEvent;
 import org.foxesworld.launchserver.LaunchServer;
 import org.foxesworld.launchserver.socket.Client;
 import org.foxesworld.launchserver.socket.response.SimpleResponse;
-import org.foxesworld.launchserver.socket.response.profile.ProfileByUUIDResponse;
-
-import java.io.IOException;
-import java.util.UUID;
 
 public class CurrentUserResponse extends SimpleResponse {
-
-    public static CurrentUserRequestEvent.UserInfo collectUserInfoFromClient(Client client) throws IOException {
-        CurrentUserRequestEvent.UserInfo result = new CurrentUserRequestEvent.UserInfo();
-        if (client.auth != null && client.isAuth && client.username != null) {
-            UUID uuid = client.uuid != null ? client.uuid : client.auth.handler.usernameToUUID(client.username);
-            if (uuid != null) {
-                result.playerProfile = ProfileByUUIDResponse.getProfile(uuid, client.username, client.profile == null ? null : client.profile.getTitle(), client.auth.textureProvider);
-            }
-        }
-        result.permissions = client.permissions;
-        return result;
-    }
 
     public static CurrentUserRequestEvent.UserInfo collectUserInfoFromClient(LaunchServer server, Client client) {
         CurrentUserRequestEvent.UserInfo result = new CurrentUserRequestEvent.UserInfo();

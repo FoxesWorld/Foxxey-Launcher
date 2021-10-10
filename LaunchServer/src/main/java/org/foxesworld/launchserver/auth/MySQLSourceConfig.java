@@ -34,10 +34,8 @@ public final class MySQLSourceConfig implements AutoCloseable {
     private String username;
     private String password;
     private String database;
-    @SuppressWarnings("unused")
     private String timezone;
-    @SuppressWarnings("unused")
-    private boolean enableHikari;
+    private boolean useHikari;
 
     // Cache
     private transient DataSource source;
@@ -103,18 +101,22 @@ public final class MySQLSourceConfig implements AutoCloseable {
             hikari = false;
             // Try using HikariCP
             source = mysqlSource;
-            if (enableHikari) {
+            if (useHikari) {
                 try {
                     Class.forName("com.zaxxer.hikari.HikariDataSource");
                     hikari = true; // Used for shutdown. Not instanceof because of possible classpath error
-                    HikariConfig cfg = new HikariConfig();
-                    cfg.setDataSource(mysqlSource);
-                    cfg.setPoolName(poolName);
-                    cfg.setMaximumPoolSize(MAX_POOL_SIZE);
+                    HikariConfig hikariConfig = new HikariConfig();
+                    hikariConfig.setDataSource(mysqlSource);
+                    hikariConfig.setPoolName(poolName);
+                    hikariConfig.setMinimumIdle(1);
+                    hikariConfig.setMaximumPoolSize(MAX_POOL_SIZE);
+                    hikariConfig.setConnectionTestQuery("SELECT 1");
+                    hikariConfig.setConnectionTimeout(1000);
+                    hikariConfig.setAutoCommit(true);
+                    hikariConfig.setLeakDetectionThreshold(2000);
                     // Set HikariCP pool
                     // Replace source with hds
-                    source = new HikariDataSource(cfg);
-                    logger.warn("HikariCP pooling enabled for '{}'", poolName);
+                    source = new HikariDataSource(hikariConfig);
                 } catch (ClassNotFoundException ignored) {
                     logger.debug("HikariCP isn't in classpath for '{}'", poolName);
                 }

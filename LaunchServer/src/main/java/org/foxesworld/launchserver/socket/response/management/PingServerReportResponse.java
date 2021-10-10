@@ -18,7 +18,7 @@ public class PingServerReportResponse extends SimpleResponse {
 
     @Override
     public void execute(ChannelHandlerContext ctx, Client client) {
-        if (!client.isAuth || client.permissions == null || !client.permissions.isPermission(ClientPermissions.PermissionConsts.MANAGEMENT)) {
+        if (!client.isAuth || client.permissions == null || !client.permissions.hasAction("launchserver\\.management\\.pingserver")) {
             sendError("Access denied");
             return;
         }

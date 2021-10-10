@@ -4,18 +4,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.foxesworld.launcher.profiles.ClientProfile;
 import org.foxesworld.launchserver.LaunchServer;
-import org.foxesworld.launchserver.auth.handler.MemoryAuthHandler;
 import org.foxesworld.launchserver.auth.protect.AdvancedProtectHandler;
 import org.foxesworld.launchserver.auth.protect.NoProtectHandler;
 import org.foxesworld.launchserver.auth.protect.StdProtectHandler;
-import org.foxesworld.launchserver.auth.provider.AcceptAuthProvider;
 import org.foxesworld.launchserver.command.Command;
 import org.foxesworld.launchserver.components.ProGuardComponent;
 import org.foxesworld.launchserver.config.LaunchServerConfig;
 import org.foxesworld.launchserver.helper.SignHelper;
 import org.foxesworld.utils.helper.IOHelper;
 import org.foxesworld.utils.helper.JVMHelper;
-import org.foxesworld.utils.helper.LogHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,11 +46,6 @@ public class SecurityCheckCommand extends Command {
         }
     }
 
-    @Deprecated
-    public static void printCheckResult(LogHelper.Level level, String module, String comment, Boolean status) {
-        printCheckResult(module, comment, status);
-    }
-
     @Override
     public String getArgsDescription() {
         return "[]";
@@ -68,19 +60,7 @@ public class SecurityCheckCommand extends Command {
     public void invoke(String... args) {
         LaunchServerConfig config = server.config;
         config.auth.forEach((name, pair) -> {
-            if (pair.provider instanceof AcceptAuthProvider) {
-                printCheckResult(String.format("auth.%s.provider", name), "Accept auth provider", false);
-            } else {
-                printCheckResult(String.format("auth.%s.provider", name), "", true);
-            }
-            if (pair.handler instanceof MemoryAuthHandler) {
-                printCheckResult(String.format("auth.%s.handler", name), "MemoryAuthHandler test-only", false);
-            } else {
-                printCheckResult(String.format("auth.%s.handler", name), "", true);
-            }
-            if(!pair.isUseCore()) {
-                printCheckResult(String.format("auth.%s", name), "AuthProvider/AuthHandler may be removed in future release", null);
-            }
+
         });
         if (config.protectHandler instanceof NoProtectHandler) {
             printCheckResult("protectHandler", "protectHandler none", false);
@@ -171,19 +151,10 @@ public class SecurityCheckCommand extends Command {
         }
 
         switch (config.env) {
-
-            case DEV:
-                printCheckResult("env", "found env DEV", false);
-                break;
-            case DEBUG:
-                printCheckResult("env", "found env DEBUG", false);
-                break;
-            case STD:
-                printCheckResult("env", "you can improve security by using env PROD", null);
-                break;
-            case PROD:
-                printCheckResult("env", "", true);
-                break;
+            case DEV -> printCheckResult("env", "found env DEV", false);
+            case DEBUG -> printCheckResult("env", "found env DEBUG", false);
+            case STD -> printCheckResult("env", "you can improve security by using env PROD", null);
+            case PROD -> printCheckResult("env", "", true);
         }
 
         //Profiles

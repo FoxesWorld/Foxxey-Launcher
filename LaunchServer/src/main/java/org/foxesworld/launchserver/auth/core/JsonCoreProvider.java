@@ -37,6 +37,8 @@ public class JsonCoreProvider extends AuthCoreProvider {
     public String verifyPasswordUrl;
     public String createOAuthSessionUrl;
     public String updateServerIdUrl;
+    public String joinServerUrl;
+    public String checkServerUrl;
     public String bearerToken;
     public PasswordVerifier passwordVerifier;
     private transient HttpClient client;
@@ -95,16 +97,16 @@ public class JsonCoreProvider extends AuthCoreProvider {
     public PasswordVerifyReport verifyPassword(User user, AuthRequest.AuthPasswordInterface password) {
         JsonUser jsonUser = (JsonUser) user;
         if (password instanceof AuthPlainPassword && jsonUser.password != null && passwordVerifier != null) {
-            if (passwordVerifier.check(((AuthPlainPassword) password).password, jsonUser.password)) {
+            if (passwordVerifier.check(jsonUser.password, ((AuthPlainPassword) password).password)) {
                 return PasswordVerifyReport.OK;
             } else {
                 return PasswordVerifyReport.FAILED;
             }
         }
         if (user == null) {
-            return jsonRequest(new JsonPasswordVerify(null, null), verifyPasswordUrl, PasswordVerifyReport.class);
+            return jsonRequest(new JsonPasswordVerify(null, null, password), verifyPasswordUrl, PasswordVerifyReport.class);
         }
-        return jsonRequest(new JsonPasswordVerify(user.getUsername(), user.getUUID()), verifyPasswordUrl, PasswordVerifyReport.class);
+        return jsonRequest(new JsonPasswordVerify(user.getUsername(), user.getUUID(), password), verifyPasswordUrl, PasswordVerifyReport.class);
     }
 
     @Override
@@ -123,7 +125,28 @@ public class JsonCoreProvider extends AuthCoreProvider {
     }
 
     @Override
+    public User checkServer(Client client, String username, String serverID) throws IOException {
+        if (checkServerUrl == null) {
+            return super.checkServer(client, username, serverID);
+        }
+        return jsonRequest(new JsonCheckServer(username, serverID), checkServerUrl, JsonUser.class);
+    }
+
+    @Override
+    public boolean joinServer(Client client, String username, String accessToken, String serverID) throws IOException {
+        if (joinServerUrl == null) {
+            return super.joinServer(client, username, accessToken, serverID);
+        }
+        return jsonRequest(new JsonJoinServer(username, accessToken, serverID), joinServerUrl, JsonSuccessResponse.class).success;
+    }
+
+    @Override
     protected boolean updateServerID(User user, String serverID) throws IOException {
+        JsonUser jsonUser = (JsonUser) user;
+        if (updateServerIdUrl == null) {
+            return false;
+        }
+        jsonUser.serverId = serverID;
         JsonSuccessResponse successResponse = jsonRequest(new JsonUpdateServerId(user.getUsername(), user.getUUID(), serverID), updateServerIdUrl, JsonSuccessResponse.class);
         if (successResponse == null) return false;
         return successResponse.success;
@@ -153,7 +176,7 @@ public class JsonCoreProvider extends AuthCoreProvider {
                     .header("Accept", "application/json")
                     .timeout(Duration.ofMillis(10000));
             if (bearerToken != null) {
-                request1.header("Authentication", "Bearer ".concat(bearerToken));
+                request1.header("Authorization", "Bearer ".concat(bearerToken));
             }
             HttpResponse<InputStream> response = client.send(request1.build(), HttpResponse.BodyHandlers.ofInputStream());
             int statusCode = response.statusCode();
@@ -209,6 +232,28 @@ public class JsonCoreProvider extends AuthCoreProvider {
         }
     }
 
+    public static class JsonCheckServer {
+        public String username;
+        public String serverId;
+
+        public JsonCheckServer(String username, String serverId) {
+            this.username = username;
+            this.serverId = serverId;
+        }
+    }
+
+    public static class JsonJoinServer {
+        public String username;
+        public String accessToken;
+        public String serverId;
+
+        public JsonJoinServer(String username, String accessToken, String serverId) {
+            this.username = username;
+            this.accessToken = accessToken;
+            this.serverId = serverId;
+        }
+    }
+
     public static class JsonAuthReportResponse {
         public String minecraftAccessToken;
         public String oauthAccessToken;
@@ -225,10 +270,12 @@ public class JsonCoreProvider extends AuthCoreProvider {
     public static class JsonPasswordVerify {
         public String username;
         public UUID uuid;
+        public AuthRequest.AuthPasswordInterface password;
 
-        public JsonPasswordVerify(String username, UUID uuid) {
+        public JsonPasswordVerify(String username, UUID uuid, AuthRequest.AuthPasswordInterface password) {
             this.username = username;
             this.uuid = uuid;
+            this.password = password;
         }
     }
 

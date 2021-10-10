@@ -19,7 +19,6 @@ import org.foxesworld.launchserver.components.AuthLimiterComponent;
 import org.foxesworld.launchserver.components.Component;
 import org.foxesworld.launchserver.components.ProGuardComponent;
 import org.foxesworld.launchserver.components.RegLimiterComponent;
-import org.foxesworld.launchserver.dao.provider.DaoProvider;
 import org.foxesworld.launchserver.client.ClientProfileProvider;
 import org.foxesworld.launchserver.client.MysqlClientProfileProvider;
 import org.foxesworld.launchserver.news.EmptyNewsProvider;
@@ -41,7 +40,6 @@ public final class LaunchServerConfig {
     public boolean cacheUpdates = true;
     public LauncherConfig.LauncherEnvironment env;
     public Map<String, AuthProviderPair> auth;
-    public DaoProvider dao;
     public SessionStorage sessions;
     // Handlers & Providers
     public ProtectHandler protectHandler;
@@ -163,10 +161,6 @@ public final class LaunchServerConfig {
             throw new NullPointerException("AuthProviderPair`s count should be at least one");
         }
 
-        if (dao != null) {
-            logger.warn("DAO deprecated and may be remove in future release");
-        }
-
         boolean isOneDefault = false;
         for (AuthProviderPair pair : auth.values()) {
             if (pair.isDefault) {
@@ -194,13 +188,6 @@ public final class LaunchServerConfig {
         Launcher.applyLauncherEnv(env);
         for (Map.Entry<String, AuthProviderPair> provider : auth.entrySet()) {
             provider.getValue().init(server, provider.getKey());
-            if (!provider.getValue().isUseCore()) {
-                logger.warn("Deprecated auth {}: legacy provider/handler auth may be removed in future release", provider.getKey());
-            }
-        }
-        if (dao != null) {
-            server.registerObject("dao", dao);
-            dao.init(server);
         }
         if (protectHandler != null) {
             server.registerObject("protectHandler", protectHandler);
@@ -224,8 +211,6 @@ public final class LaunchServerConfig {
         }
         if (!type.equals(LaunchServer.ReloadType.NO_AUTH)) {
             for (AuthProviderPair pair : auth.values()) {
-                server.registerObject("auth.".concat(pair.name).concat(".provider"), pair.provider);
-                server.registerObject("auth.".concat(pair.name).concat(".handler"), pair.handler);
                 server.registerObject("auth.".concat(pair.name).concat(".core"), pair.core);
                 server.registerObject("auth.".concat(pair.name).concat(".social"), pair.social);
                 server.registerObject("auth.".concat(pair.name).concat(".texture"), pair.textureProvider);
@@ -238,8 +223,6 @@ public final class LaunchServerConfig {
         try {
             if (!type.equals(LaunchServer.ReloadType.NO_AUTH)) {
                 for (AuthProviderPair pair : auth.values()) {
-                    server.unregisterObject("auth.".concat(pair.name).concat(".provider"), pair.provider);
-                    server.unregisterObject("auth.".concat(pair.name).concat(".handler"), pair.handler);
                     server.unregisterObject("auth.".concat(pair.name).concat(".social"), pair.social);
                     server.unregisterObject("auth.".concat(pair.name).concat(".core"), pair.core);
                     server.unregisterObject("auth.".concat(pair.name).concat(".texture"), pair.textureProvider);
@@ -278,16 +261,6 @@ public final class LaunchServerConfig {
             if (sessions instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) sessions).close();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            }
-        }
-        if (dao != null) {
-            server.unregisterObject("dao", dao);
-            if (dao instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) dao).close();
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -334,8 +307,6 @@ public final class LaunchServerConfig {
     public static class LauncherConf {
         public String guardType;
         public boolean compress;
-        @Deprecated
-        public boolean warningMissArchJava;
         public boolean stripLineNumbers;
         public boolean deleteTempFiles;
         public boolean certificatePinning;

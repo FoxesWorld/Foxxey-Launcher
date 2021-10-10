@@ -5,7 +5,6 @@ import org.foxesworld.launcher.serialize.HInput;
 import org.foxesworld.launcher.serialize.HOutput;
 import org.foxesworld.launcher.serialize.stream.EnumSerializer;
 import org.foxesworld.utils.helper.IOHelper;
-import org.foxesworld.utils.helper.LogHelper;
 import org.foxesworld.utils.helper.VerifyHelper;
 
 import java.io.IOException;
@@ -31,16 +30,10 @@ public final class HashedDir extends HashedEntry {
             // Read entry
             HashedEntry entry;
             Type type = Type.read(input);
-            switch (type) {
-                case FILE:
-                    entry = new HashedFile(input);
-                    break;
-                case DIR:
-                    entry = new HashedDir(input);
-                    break;
-                default:
-                    throw new AssertionError("Unsupported hashed entry type: " + type.name());
-            }
+            entry = switch (type) {
+                case FILE -> new HashedFile(input);
+                case DIR -> new HashedDir(input);
+            };
 
             // Try add entry to map
             VerifyHelper.putIfAbsent(map, name, entry, String.format("Duplicate dir entry: '%s'", name));
@@ -68,39 +61,6 @@ public final class HashedDir extends HashedEntry {
         map.remove(name);
     }
 
-    public void removeR(String name) {
-        LinkedList<String> dirs = new LinkedList<>();
-        StringTokenizer t = new StringTokenizer(name, "/");
-        while (t.hasMoreTokens()) {
-            dirs.add(t.nextToken());
-        }
-        Map<String, HashedEntry> current = map;
-        for (String s : dirs) {
-            HashedEntry e = current.get(s);
-            if (e == null) {
-                if (LogHelper.isDebugEnabled()) {
-                    LogHelper.debug("Null %s", s);
-                }
-                if (LogHelper.isDebugEnabled()) {
-                    for (String x : current.keySet()) LogHelper.debug("Contains %s", x);
-                }
-                break;
-            }
-            if (e.getType() == Type.DIR) {
-                current = ((HashedDir) e).map;
-                if (LogHelper.isDebugEnabled()) {
-                    LogHelper.debug("Found dir %s", s);
-                }
-            } else {
-                current.remove(s);
-                if (LogHelper.isDebugEnabled()) {
-                    LogHelper.debug("Found filename %s", s);
-                }
-                break;
-            }
-        }
-    }
-
     public void moveTo(String elementName, HashedDir target, String targetElementName) {
         HashedEntry entry = map.remove(elementName);
         target.map.put(targetElementName, entry);
@@ -116,6 +76,9 @@ public final class HashedDir extends HashedEntry {
             HashedEntry e = current.map.get(name);
             if (e == null && !t.hasMoreTokens()) {
                 break;
+            }
+            if (e == null) {
+                throw new RuntimeException(String.format("Directory %s not found", name));
             }
             if (e.getType() == Type.DIR) {
                 if (!t.hasMoreTokens()) {

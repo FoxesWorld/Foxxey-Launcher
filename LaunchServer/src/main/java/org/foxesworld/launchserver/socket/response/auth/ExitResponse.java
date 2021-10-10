@@ -2,7 +2,6 @@ package org.foxesworld.launchserver.socket.response.auth;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import org.foxesworld.launcher.ClientPermissions;
 import org.foxesworld.launcher.events.RequestEvent;
 import org.foxesworld.launcher.events.request.ExitRequestEvent;
 import org.foxesworld.launchserver.LaunchServer;
@@ -11,7 +10,6 @@ import org.foxesworld.launchserver.auth.core.interfaces.provider.AuthSupportExit
 import org.foxesworld.launchserver.socket.Client;
 import org.foxesworld.launchserver.socket.handlers.WebSocketFrameHandler;
 import org.foxesworld.launchserver.socket.response.SimpleResponse;
-import org.foxesworld.utils.helper.LogHelper;
 
 public class ExitResponse extends SimpleResponse {
     public boolean exitAll;
@@ -36,7 +34,7 @@ public class ExitResponse extends SimpleResponse {
 
     @Override
     public void execute(ChannelHandlerContext ctx, Client client) {
-        if (username != null && (!client.isAuth || client.permissions == null || !client.permissions.isPermission(ClientPermissions.PermissionConsts.ADMIN))) {
+        if (username != null && (!client.isAuth || client.permissions == null || !client.permissions.hasAction("launchserver\\.management\\.kick"))) {
             sendError("Permissions denied");
             return;
         }

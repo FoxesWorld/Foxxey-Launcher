@@ -3,12 +3,10 @@ package org.foxesworld.launchserver.manangers;
 import org.foxesworld.launcher.Launcher;
 import org.foxesworld.launcher.NeedGarbageCollection;
 import org.foxesworld.launchserver.LaunchServer;
-import org.foxesworld.launchserver.auth.RequiredDAO;
 import org.foxesworld.launchserver.socket.Client;
 import org.foxesworld.utils.HookSet;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -39,11 +37,6 @@ public class SessionManager implements NeedGarbageCollection {
         return server.config.sessions.deleteSessionsByUserUUID(uuid);
     }
 
-    @Deprecated
-    public Set<UUID> getSavedUUIDs() {
-        throw new UnsupportedOperationException();
-    }
-
     public void clear() {
         server.config.sessions.clear();
     }
@@ -56,18 +49,11 @@ public class SessionManager implements NeedGarbageCollection {
         return Launcher.gsonManager.gson.fromJson(new String(client, StandardCharsets.UTF_8), Client.class); //Compress using later
     }
 
-    @SuppressWarnings("deprecation")
     private Client restoreFromString(byte[] data) {
         Client result = decompressClient(data);
         result.updateAuth(server);
         if (result.auth != null && (result.username != null)) {
-            if (result.auth.isUseCore()) {
-                result.coreObject = result.auth.core.getUserByUUID(result.uuid);
-            } else {
-                if (result.auth.handler instanceof RequiredDAO || result.auth.provider instanceof RequiredDAO || result.auth.textureProvider instanceof RequiredDAO) {
-                    result.daoObject = server.config.dao.userDAO.findByUsername(result.username);
-                }
-            }
+            result.coreObject = result.auth.core.getUserByUUID(result.uuid);
         }
         if (result.refCount == null) result.refCount = new AtomicInteger(1);
         clientRestoreHook.hook(result);
@@ -94,25 +80,5 @@ public class SessionManager implements NeedGarbageCollection {
 
     public boolean remove(UUID session) {
         return server.config.sessions.deleteSession(session);
-    }
-
-    @Deprecated
-    public void removeClient(UUID session) {
-        remove(session);
-    }
-
-    @Deprecated
-    public void updateClient(@SuppressWarnings("unused") UUID session) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Deprecated
-    public Set<Client> getSessions() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Deprecated
-    public void loadSessions(@SuppressWarnings("unused") Set<Client> set) {
-        throw new UnsupportedOperationException();
     }
 }

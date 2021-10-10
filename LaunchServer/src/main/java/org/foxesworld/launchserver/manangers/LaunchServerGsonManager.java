@@ -11,15 +11,12 @@ import org.foxesworld.launcher.request.WebSocketEvent;
 import org.foxesworld.launcher.request.auth.AuthRequest;
 import org.foxesworld.launcher.request.auth.GetAvailabilityAuthRequest;
 import org.foxesworld.launchserver.auth.core.AuthCoreProvider;
-import org.foxesworld.launchserver.auth.handler.AuthHandler;
 import org.foxesworld.launchserver.auth.password.PasswordVerifier;
 import org.foxesworld.launchserver.auth.protect.ProtectHandler;
 import org.foxesworld.launchserver.auth.protect.hwid.HWIDProvider;
-import org.foxesworld.launchserver.auth.provider.AuthProvider;
 import org.foxesworld.launchserver.auth.session.SessionStorage;
 import org.foxesworld.launchserver.auth.texture.TextureProvider;
 import org.foxesworld.launchserver.components.Component;
-import org.foxesworld.launchserver.dao.provider.DaoProvider;
 import org.foxesworld.launchserver.modules.impl.LaunchServerModulesManager;
 import org.foxesworld.launchserver.news.NewsProvider;
 import org.foxesworld.launchserver.socket.WebSocketService;
@@ -38,16 +35,12 @@ public class LaunchServerGsonManager extends GsonManager {
     @Override
     public void registerAdapters(GsonBuilder builder) {
         super.registerAdapters(builder);
-        builder.registerTypeAdapter(AuthProvider.class, new UniversalJsonAdapter<>(AuthProvider.providers));
         builder.registerTypeAdapter(TextureProvider.class, new UniversalJsonAdapter<>(TextureProvider.providers));
-        builder.registerTypeAdapter(AuthHandler.class, new UniversalJsonAdapter<>(AuthHandler.providers));
         builder.registerTypeAdapter(AuthCoreProvider.class, new UniversalJsonAdapter<>(AuthCoreProvider.providers));
         builder.registerTypeAdapter(PasswordVerifier.class, new UniversalJsonAdapter<>(PasswordVerifier.providers));
         builder.registerTypeAdapter(Component.class, new UniversalJsonAdapter<>(Component.providers));
         builder.registerTypeAdapter(ProtectHandler.class, new UniversalJsonAdapter<>(ProtectHandler.providers));
         builder.registerTypeAdapter(ClientProfileProvider.class, new UniversalJsonAdapter<>(ClientProfileProvider.providers));
-        builder.registerTypeAdapter(NewsProvider.class, new UniversalJsonAdapter<>(NewsProvider.providers));
-        builder.registerTypeAdapter(DaoProvider.class, new UniversalJsonAdapter<>(DaoProvider.providers));
         builder.registerTypeAdapter(WebSocketServerResponse.class, new UniversalJsonAdapter<>(WebSocketService.providers, UnknownResponse.class));
         builder.registerTypeAdapter(WebSocketEvent.class, new JsonResultSerializeAdapter());
         builder.registerTypeAdapter(AuthRequest.AuthPasswordInterface.class, new UniversalJsonAdapter<>(AuthRequest.providers));

@@ -1,29 +1,16 @@
 package org.foxesworld.launcher.profiles;
 
-import org.foxesworld.launcher.serialize.HInput;
-import org.foxesworld.launcher.serialize.HOutput;
-import org.foxesworld.launcher.serialize.stream.StreamObject;
 import org.foxesworld.utils.helper.IOHelper;
 import org.foxesworld.utils.helper.VerifyHelper;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
-public final class PlayerProfile extends StreamObject {
+public final class PlayerProfile {
 
     public final UUID uuid;
     public final String username;
     public final Texture skin, cloak;
-
-
-    public PlayerProfile(HInput input) throws IOException {
-        uuid = input.readUUID();
-        username = VerifyHelper.verifyUsername(input.readString(64));
-        skin = input.readBoolean() ? new Texture(input) : null;
-        cloak = input.readBoolean() ? new Texture(input) : null;
-    }
-
 
     public PlayerProfile(UUID uuid, String username, Texture skin, Texture cloak) {
         this.uuid = Objects.requireNonNull(uuid, "uuid");
@@ -39,19 +26,4 @@ public final class PlayerProfile extends StreamObject {
     public static UUID offlineUUID(String username) {
         return UUID.nameUUIDFromBytes(IOHelper.encodeASCII("OfflinePlayer:" + username));
     }
-
-    @Override
-    public void write(HOutput output) throws IOException {
-        output.writeUUID(uuid);
-        output.writeString(username, 64);
-
-        // Write textures
-        output.writeBoolean(skin != null);
-        if (skin != null)
-            skin.write(output);
-        output.writeBoolean(cloak != null);
-        if (cloak != null)
-            cloak.write(output);
-    }
-
 }

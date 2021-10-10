@@ -6,7 +6,6 @@ import org.foxesworld.launcher.request.Request;
 import org.foxesworld.launcher.request.auth.password.*;
 import org.foxesworld.launcher.request.websockets.WebSocketRequest;
 import org.foxesworld.utils.ProviderMap;
-import org.foxesworld.utils.helper.VerifyHelper;
 
 public final class AuthRequest extends Request<AuthRequestEvent> implements WebSocketRequest {
     public static final ProviderMap<AuthPasswordInterface> providers = new ProviderMap<>();
@@ -23,36 +22,6 @@ public final class AuthRequest extends Request<AuthRequestEvent> implements WebS
     private final ConnectTypes authType;
     @LauncherNetworkAPI
     private final String hardwareId;
-
-    @Deprecated
-    public AuthRequest(String login, byte[] password) {
-        this.login = VerifyHelper.verify(login, VerifyHelper.NOT_EMPTY, "Login can't be empty");
-        this.password = new AuthECPassword(password.clone());
-        auth_id = "";
-        getSession = true;
-        authType = ConnectTypes.CLIENT;
-        hardwareId = null;
-    }
-
-    @Deprecated
-    public AuthRequest(String login, byte[] password, String auth_id) {
-        this.login = VerifyHelper.verify(login, VerifyHelper.NOT_EMPTY, "Login can't be empty");
-        this.password = new AuthECPassword(password.clone());
-        this.auth_id = auth_id;
-        getSession = true;
-        authType = ConnectTypes.CLIENT;
-        hardwareId = null;
-    }
-
-    @Deprecated
-    public AuthRequest(String login, byte[] encryptedPassword, String auth_id, ConnectTypes authType) {
-        this.login = login;
-        this.password = new AuthECPassword(encryptedPassword.clone());
-        this.auth_id = auth_id;
-        this.authType = authType;
-        this.getSession = false;
-        hardwareId = null;
-    }
 
     public AuthRequest(String login, String password, String auth_id, ConnectTypes authType) {
         this.login = login;
@@ -82,12 +51,10 @@ public final class AuthRequest extends Request<AuthRequestEvent> implements WebS
         this.hardwareId = hardwareId;
     }
 
-    @SuppressWarnings("deprecation")
     public static void registerProviders() {
         if (!registerProviders) {
             providers.register("plain", AuthPlainPassword.class);
             providers.register("rsa2", AuthRSAPassword.class);
-            providers.register("rsa", AuthECPassword.class);
             providers.register("aes", AuthAESPassword.class);
             providers.register("2fa", Auth2FAPassword.class);
             providers.register("multi", AuthMultiPassword.class);
@@ -105,9 +72,6 @@ public final class AuthRequest extends Request<AuthRequestEvent> implements WebS
     }
 
     public enum ConnectTypes {
-        @Deprecated
-        @LauncherNetworkAPI
-        SERVER,
         @LauncherNetworkAPI
         CLIENT,
         @LauncherNetworkAPI

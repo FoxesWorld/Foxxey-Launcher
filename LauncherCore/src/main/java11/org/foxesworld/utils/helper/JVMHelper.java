@@ -29,6 +29,7 @@ public final class JVMHelper {
     public static final Runtime RUNTIME = Runtime.getRuntime();
     public static final ClassLoader LOADER = ClassLoader.getSystemClassLoader();
     public static final int JVM_VERSION = getVersion();
+    public static final int JVM_BUILD = getBuild();
 
     static {
         try {
@@ -39,6 +40,10 @@ public final class JVMHelper {
     }
 
     private JVMHelper() {
+    }
+
+    public static int getBuild() {
+        return Runtime.version().update();
     }
 
     public static int getVersion() {

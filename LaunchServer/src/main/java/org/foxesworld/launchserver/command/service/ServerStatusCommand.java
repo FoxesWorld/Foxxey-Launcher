@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.foxesworld.launchserver.LaunchServer;
 import org.foxesworld.launchserver.auth.AuthProviderPair;
-import org.foxesworld.launchserver.auth.handler.CachedAuthHandler;
 import org.foxesworld.launchserver.command.Command;
 import org.foxesworld.utils.command.CommandHandler;
 import org.foxesworld.utils.helper.JVMHelper;
@@ -43,9 +42,7 @@ public class ServerStatusCommand extends Command {
         }
         logger.info("Commands: {}({} categories)", commands, server.commandHandler.getCategories().size() + 1);
         for (AuthProviderPair pair : server.config.auth.values()) {
-            if (pair.handler instanceof CachedAuthHandler) {
-                logger.info("AuthHandler {}: EntryCache: {} | usernameCache: {}", pair.name, ((CachedAuthHandler) pair.handler).getEntryCache().size(), ((CachedAuthHandler) pair.handler).getUsernamesCache().size());
-            }
+
         }
 
     }

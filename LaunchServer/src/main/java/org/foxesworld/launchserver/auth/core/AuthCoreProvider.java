@@ -1,5 +1,6 @@
 package org.foxesworld.launchserver.auth.core;
 
+import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.foxesworld.launcher.Launcher;
@@ -14,6 +15,7 @@ import org.foxesworld.launchserver.auth.AuthException;
 import org.foxesworld.launchserver.auth.core.interfaces.UserHardware;
 import org.foxesworld.launchserver.auth.core.interfaces.provider.AuthSupportGetAllUsers;
 import org.foxesworld.launchserver.auth.core.interfaces.provider.AuthSupportHardware;
+import org.foxesworld.launchserver.auth.core.interfaces.provider.AuthSupportRegistration;
 import org.foxesworld.launchserver.auth.core.interfaces.user.UserSupportHardware;
 import org.foxesworld.launchserver.auth.protect.hwid.HWIDProvider;
 import org.foxesworld.launchserver.manangers.AuthManager;
@@ -25,6 +27,7 @@ import org.foxesworld.utils.command.CommandException;
 import org.foxesworld.utils.command.SubCommand;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -145,13 +148,13 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
                     return;
                 }
                 if (report.isUsingOAuth()) {
-                    logger.info("OAuth: AccessToken: {} RefreshToken: {} MinecraftAccessToken: {}", report.oauthAccessToken, report.oauthRefreshToken, report.minecraftAccessToken);
-                    if (report.session != null) {
-                        logger.info("UserSession: id {} expire {} user {}", report.session.getID(), report.session.getExpireIn(), report.session.getUser() == null ? "null" : "found");
-                        logger.info(report.session.toString());
+                    logger.info("OAuth: AccessToken: {} RefreshToken: {} MinecraftAccessToken: {}", report.oauthAccessToken(), report.oauthRefreshToken(), report.minecraftAccessToken());
+                    if (report.session() != null) {
+                        logger.info("UserSession: id {} expire {} user {}", report.session().getID(), report.session().getExpireIn(), report.session().getUser() == null ? "null" : "found");
+                        logger.info(report.session().toString());
                     }
                 } else {
-                    logger.info("Basic: MinecraftAccessToken: {}", report.minecraftAccessToken);
+                    logger.info("Basic: MinecraftAccessToken: {}", report.minecraftAccessToken());
                 }
             }
         });
@@ -281,11 +284,41 @@ public abstract class AuthCoreProvider implements AutoCloseable, Reconfigurable 
                 });
             }
         }
+        {
+            var instance = isSupport(AuthSupportRegistration.class);
+            if (instance != null) {
+                map.put("register", new SubCommand("[username] [email] [plain or json password] (json args)", "Register new user") {
+                    @Override
+                    public void invoke(String... args) throws Exception {
+                        verifyArgs(args, 2);
+                        Map<String, String> map = null;
+                        String username = args[0];
+                        String email = args[1];
+                        String plainPassword = args[2];
+                        if (args.length > 3) {
+                            Type typeOfMap = new TypeToken<Map<String, String>>() {
+                            }.getType();
+                            map = Launcher.gsonManager.gson.fromJson(args[2], typeOfMap);
+                        }
+                        AuthRequest.AuthPasswordInterface password;
+                        if (plainPassword.startsWith("{")) {
+                            password = Launcher.gsonManager.gson.fromJson(plainPassword, AuthRequest.AuthPasswordInterface.class);
+                        } else {
+                            password = new AuthPlainPassword(plainPassword);
+                        }
+                        instance.registration(username, email, password, map);
+                    }
+                });
+            }
+        }
         return map;
     }
 
     public User checkServer(Client client, String username, String serverID) throws IOException {
         User user = getUserByUsername(username);
+        if (user == null) {
+            return null;
+        }
         if (user.getUsername().equals(username) && user.getServerId().equals(serverID)) {
             return user;
         }

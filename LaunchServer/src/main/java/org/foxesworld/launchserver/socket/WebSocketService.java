@@ -16,7 +16,6 @@ import org.foxesworld.launcher.events.request.ErrorRequestEvent;
 import org.foxesworld.launcher.events.request.ExitRequestEvent;
 import org.foxesworld.launcher.request.WebSocketEvent;
 import org.foxesworld.launchserver.LaunchServer;
-import org.foxesworld.launchserver.dao.User;
 import org.foxesworld.launchserver.socket.handlers.WebSocketFrameHandler;
 import org.foxesworld.launchserver.socket.response.SimpleResponse;
 import org.foxesworld.launchserver.socket.response.WebSocketServerResponse;
@@ -44,7 +43,6 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class WebSocketService {
     public static final ProviderMap<WebSocketServerResponse> providers = new ProviderMap<>();
@@ -157,8 +155,7 @@ public class WebSocketService {
         if (hook.hook(context, ctx)) {
             return;
         }
-        if (response instanceof SimpleResponse) {
-            SimpleResponse simpleResponse = (SimpleResponse) response;
+        if (response instanceof SimpleResponse simpleResponse) {
             simpleResponse.server = server;
             simpleResponse.service = this;
             simpleResponse.ctx = ctx;
@@ -226,19 +223,6 @@ public class WebSocketService {
             Client client = wsHandler.getClient();
             if (client == null || !userUuid.equals(client.uuid)) continue;
             ch.writeAndFlush(new TextWebSocketFrame(gson.toJson(obj, type)), ch.voidPromise());
-        }
-    }
-
-    @Deprecated
-    public void updateDaoObject(UUID userUuid, User daoObject, Consumer<Channel> callback) {
-        for (Channel ch : channels) {
-            if (ch == null || ch.pipeline() == null) continue;
-            WebSocketFrameHandler wsHandler = ch.pipeline().get(WebSocketFrameHandler.class);
-            if (wsHandler == null) continue;
-            Client client = wsHandler.getClient();
-            if (client == null || client.daoObject == null || !userUuid.equals(client.uuid)) continue;
-            client.daoObject = daoObject;
-            if (callback != null) callback.accept(ch);
         }
     }
 

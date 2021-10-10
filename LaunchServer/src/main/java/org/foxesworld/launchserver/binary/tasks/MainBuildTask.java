@@ -42,7 +42,6 @@ public class MainBuildTask implements LauncherBuildTask {
         reader = new ClassMetadataReader();
         InjectClassAcceptor injectClassAcceptor = new InjectClassAcceptor(properties);
         transformers.add(injectClassAcceptor);
-        blacklist.add("org/foxesworld/launcher/debug/");
     }
 
     @Override
@@ -63,7 +62,7 @@ public class MainBuildTask implements LauncherBuildTask {
             for (Path e : server.launcherBinary.coreLibs) {
                 reader.getCp().add(new JarFile(e.toFile()));
             }
-            context.pushJarFile(inputJar, (e) -> blacklist.contains(e.getName()), (e) -> true);
+            context.pushJarFile(inputJar, (e) -> blacklist.contains(e.getName()) || e.getName().startsWith("pro/gravit/launcher/debug/"), (e) -> true);
 
             // map for guard
             Map<String, byte[]> runtime = new HashMap<>(256);
@@ -136,8 +135,7 @@ public class MainBuildTask implements LauncherBuildTask {
         ClassWriter writer;
         ClassNode cn = null;
         for (Transformer t : transformers) {
-            if (t instanceof ASMTransformer) {
-                ASMTransformer asmTransformer = (ASMTransformer) t;
+            if (t instanceof ASMTransformer asmTransformer) {
                 if (cn == null) {
                     ClassReader cr = new ClassReader(result);
                     cn = new ClassNode();

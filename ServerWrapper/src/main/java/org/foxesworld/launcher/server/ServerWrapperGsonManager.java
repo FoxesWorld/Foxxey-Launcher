@@ -6,16 +6,13 @@ import org.foxesworld.launcher.modules.events.PreGsonPhase;
 import org.foxesworld.launcher.request.websockets.ClientWebSocketService;
 
 public class ServerWrapperGsonManager extends GsonManager {
-    private final ServerWrapperModulesManager modulesManager;
 
-    public ServerWrapperGsonManager(ServerWrapperModulesManager modulesManager) {
-        this.modulesManager = modulesManager;
+    public ServerWrapperGsonManager() {
     }
 
     @Override
     public void registerAdapters(GsonBuilder builder) {
         super.registerAdapters(builder);
         ClientWebSocketService.appendTypeAdapters(builder);
-        modulesManager.invokeEvent(new PreGsonPhase(builder));
     }
 }

@@ -1,9 +1,6 @@
 package org.foxesworld.launchserver.command.handler;
 
 import org.foxesworld.launchserver.LaunchServer;
-import org.foxesworld.launchserver.command.auth.AuthCommand;
-import org.foxesworld.launchserver.command.auth.UUIDToUsernameCommand;
-import org.foxesworld.launchserver.command.auth.UsernameToUUIDCommand;
 import org.foxesworld.launchserver.command.basic.*;
 import org.foxesworld.launchserver.command.hash.*;
 import org.foxesworld.launchserver.command.modules.LoadModuleCommand;
@@ -51,14 +48,6 @@ public abstract class CommandHandler extends org.foxesworld.utils.command.Comman
         Category updatesCategory = new Category(updates, "updates", "Update and Sync Management");
         handler.registerCategory(updatesCategory);
 
-        // Register auth commands
-        BaseCommandCategory auth = new BaseCommandCategory();
-        auth.registerCommand("auth", new AuthCommand(server));
-        auth.registerCommand("usernameToUUID", new UsernameToUUIDCommand(server));
-        auth.registerCommand("uuidToUsername", new UUIDToUsernameCommand(server));
-        Category authCategory = new Category(auth, "auth", "User Management");
-        handler.registerCategory(authCategory);
-
         //Register service commands
         BaseCommandCategory service = new BaseCommandCategory();
         service.registerCommand("config", new ConfigCommand(server));
@@ -72,6 +61,7 @@ public abstract class CommandHandler extends org.foxesworld.utils.command.Comman
         service.registerCommand("pingServers", new PingServersCommand(server));
         service.registerCommand("securitycheck", new SecurityCheckCommand(server));
         service.registerCommand("newsList", new NewsListCommand(server));
+        service.registerCommand("token", new TokenCommand(server));
         Category serviceCategory = new Category(service, "service", "Managing LaunchServer Components");
         handler.registerCategory(serviceCategory);
     }

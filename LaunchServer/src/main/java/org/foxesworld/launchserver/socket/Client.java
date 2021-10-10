@@ -5,7 +5,6 @@ import org.foxesworld.launcher.profiles.ClientProfile;
 import org.foxesworld.launcher.request.secure.HardwareReportRequest;
 import org.foxesworld.launchserver.LaunchServer;
 import org.foxesworld.launchserver.auth.AuthProviderPair;
-import org.foxesworld.launchserver.dao.User;
 import org.foxesworld.launchserver.socket.response.auth.AuthResponse;
 
 import java.util.HashMap;
@@ -30,9 +29,6 @@ public class Client {
     public int balance;
 
     public transient AuthProviderPair auth;
-
-    @Deprecated
-    public transient User daoObject;
 
     public transient org.foxesworld.launchserver.auth.core.User coreObject;
 
@@ -89,21 +85,15 @@ public class Client {
     @SuppressWarnings("unused")
     public void setSerializableProperty(String name, String value) {
         if (serializableProperties == null) serializableProperties = new HashMap<>();
-        properties.put(name, value);
+        serializableProperties.put(name, value);
     }
 
     public org.foxesworld.launchserver.auth.core.User getUser() {
         if (coreObject != null) return coreObject;
-        if (auth != null && uuid != null && auth.isUseCore()) {
+        if (auth != null && uuid != null) {
             coreObject = auth.core.getUserByUUID(uuid);
         }
         return coreObject;
-    }
-
-    @Deprecated
-    public enum Type {
-        SERVER,
-        USER
     }
 
     public static class TrustLevel {

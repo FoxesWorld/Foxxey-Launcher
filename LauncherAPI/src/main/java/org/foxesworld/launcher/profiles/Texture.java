@@ -1,6 +1,5 @@
 package org.foxesworld.launcher.profiles;
 
-import org.foxesworld.launcher.serialize.HInput;
 import org.foxesworld.launcher.serialize.HOutput;
 import org.foxesworld.launcher.serialize.stream.StreamObject;
 import org.foxesworld.utils.helper.IOHelper;
@@ -24,13 +23,6 @@ public final class Texture extends StreamObject {
     public final byte[] digest;
 
     public final Map<String, String> metadata;
-
-    public Texture(HInput input) throws IOException {
-        url = IOHelper.verifyURL(input.readASCII(2048));
-        digest = input.readByteArray(-DIGEST_ALGO.bytes);
-        metadata = null;
-    }
-
 
     public Texture(String url, boolean cloak) throws IOException {
         this.url = IOHelper.verifyURL(url);

@@ -16,7 +16,6 @@ import java.util.UUID;
 import org.foxesworld.launcher.hasher.FileNameMatcher;
 import org.foxesworld.launcher.profiles.optional.OptionalDepend;
 import org.foxesworld.launcher.profiles.optional.OptionalFile;
-import org.foxesworld.launcher.profiles.optional.OptionalType;
 import org.foxesworld.launcher.profiles.optional.triggers.OptionalTrigger;
 import org.foxesworld.utils.helper.IOHelper;
 import org.foxesworld.utils.helper.VerifyHelper;
@@ -288,23 +287,8 @@ public final class ClientProfile implements Comparable<ClientProfile> {
     return null;
   }
 
-  @Deprecated
-  public OptionalFile getOptionalFile(String file, OptionalType type) {
-    for (OptionalFile f : updateOptional) {
-      if (f.type.equals(type) && f.name.equals(file)) {
-        return f;
-      }
-    }
-    return null;
-  }
-
   public Collection<String> getShared() {
     return updateShared;
-  }
-
-  @Deprecated
-  public InetSocketAddress getServerSocketAddress() {
-    return InetSocketAddress.createUnresolved(getServerAddress(), getServerPort());
   }
 
   public String getServerAddress() {
