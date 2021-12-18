@@ -3,7 +3,7 @@ __FoxesWorld__ launcher
 **TODO**
 
 - __SystemdNotifer__
-- Rewrite filesLoad
+- __GNL__ (Get And Load)
 - Add optional files to every client
 - Add optional server settings
 - Include __FoxesWorld__ libraries - `foxesSound`, `startUpSound`
