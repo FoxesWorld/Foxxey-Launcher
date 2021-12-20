@@ -49,6 +49,7 @@ public class LaunchServerGsonManager extends GsonManager {
         builder.registerTypeAdapter(OptionalAction.class, new UniversalJsonAdapter<>(OptionalAction.providers));
         builder.registerTypeAdapter(OptionalTrigger.class, new UniversalJsonAdapter<>(OptionalTrigger.providers));
         builder.registerTypeAdapter(SessionStorage.class, new UniversalJsonAdapter<>(SessionStorage.providers));
+        builder.registerTypeAdapter(NewsProvider.class, new UniversalJsonAdapter<>(NewsProvider.providers));
         modulesManager.invokeEvent(new PreGsonPhase(builder));
     }
 }
